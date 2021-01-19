@@ -10,10 +10,12 @@ const binance = new Binance().options({
 });
 
 // Let's create the regular HTTP request and response
-app.get('/', function (req, res) {
-  res.send('hello workld')
-  return;
-});
+// app.get('/', function (req, res) {
+//   res.send('hello workld')
+//   return;
+// });
+
+app.use(express.static('dist'))
 
 app.post('/getTrades', function(req, res) {
   binance.trades("BTCUSDT", (error, trades, symbol) => {
