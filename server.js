@@ -42,7 +42,7 @@ wss.on('connection', function connection (ws) {
      // if (client.readyState === WebSocket.OPEN) {
         setInterval(() => {
           client.send(JSON.stringify(data));
-        }, 200);
+        }, 50);
      // }
     });
   // });git 
