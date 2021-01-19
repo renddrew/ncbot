@@ -1,6 +1,12 @@
 <template>
   <div class="hello">
 
+    <!-- TradingView Widget BEGIN -->
+<div class="tradingview-widget-container">
+  <div id="tradingview_3194a"></div>
+</div>
+<!-- TradingView Widget END -->
+
     <h1>BTCUSDT: {{ socket.message }}</h1>
     <ul>
       <li v-for="(t, i) in trades">
@@ -57,11 +63,29 @@ export default {
     niceTime(ts) {
       return moment.unix(ts/1000).format('MMM Do YYYY h:mm a')
     },
-      
   },
 
   mounted() {
     this.getTrades();
+
+     new TradingView.widget({
+      "width": '100%',
+      "autosize": false,
+      "symbol": "BINANCE:BTCUSDT",
+      "interval": "1",
+      "timezone": "America/Toronto",
+      "theme": "dark",
+      "style": "1",
+      "locale": "en",
+      "toolbar_bg": "#f1f3f6",
+      "enable_publishing": false,
+      "allow_symbol_change": true,
+      "studies": [
+        "BB@tv-basicstudies",
+        "RSI@tv-basicstudies"
+      ],
+      "container_id": "tradingview_3194a"
+    });
   }
 };
 
@@ -69,5 +93,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+
+#tradingview_3194a iframe {
+
+}
 
 </style>
