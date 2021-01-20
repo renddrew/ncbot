@@ -29,30 +29,38 @@ app.post('/getTrades', (req, res) => {
       if (i > 80) break;
 
       // always add item to grouped trades, whether has match or not yet
-      groupedTrades.push(trades[i]);
+      
       const lastTrade = trades[i - 1];
 
-      if (lastTradeId !== trades[i].orderId && i !== 0) {
+      if ((lastTradeId !== trades[i].orderId) && i !== 0) {
+
         // do averaging for each grouped trade item
-        const averagedFromGroup = {price: 0, qty: 0, quoteQty: 0, commission: 0 };
+        const averagedFromGroup = { price: 0, qty: 0, quoteQty: 0, commission: 0 };
+        
         for (let gi = 0; gi < groupedTrades.length; gi++) {
           // add to averagedFromGroup properties
-          averagedFromGroup.price += utils.formatNum(lastTrade.price, 2);
-          averagedFromGroup.qty += utils.formatNum(lastTrade.qty, 6);
-          averagedFromGroup.quoteQty += utils.formatNum(lastTrade.quoteQty, 2);
-          averagedFromGroup.commission += utils.formatNum(lastTrade.commission, 6);
+          averagedFromGroup.price += utils.formatNum(groupedTrades[gi].price, 2);
+          averagedFromGroup.qty += utils.formatNum(groupedTrades[gi].qty, 6);
+          averagedFromGroup.quoteQty += utils.formatNum(groupedTrades[gi].quoteQty, 2);
+          averagedFromGroup.commission += utils.formatNum(groupedTrades[gi].commission, 6);
         }
         // do averaged from group division based on length of averagedFromGroup
-        const tradeGroupAveraged = lastTrade;
+        const tradeGroupAveraged = groupedTrades[0];
 
         tradeGroupAveraged.price = utils.formatNum(averagedFromGroup.price / groupedTrades.length, 2);
-        tradeGroupAveraged.qty = utils.formatNum(averagedFromGroup.qty / groupedTrades.length, 6);
-        tradeGroupAveraged.quoteQty = utils.formatNum(averagedFromGroup.quoteQty / groupedTrades.length, 2);
-        tradeGroupAveraged.commission = utils.formatNum(averagedFromGroup.commission / groupedTrades.length, 6);
+        tradeGroupAveraged.qty = utils.formatNum(averagedFromGroup.qty, 6);
+        tradeGroupAveraged.quoteQty = utils.formatNum(averagedFromGroup.quoteQty, 2);
+        tradeGroupAveraged.commission = utils.formatNum(averagedFromGroup.commission, 6);
 
         // push single grouped trade to filteredTrades
         filteredTrades.push(tradeGroupAveraged);
+
+        // start new grouped trades set for next trade
         groupedTrades = [];
+        groupedTrades.push(trades[i]);
+      } else {
+        // tradeId matches last
+        groupedTrades.push(trades[i]);
       }
 
       lastTradeId = trades[i].orderId;
