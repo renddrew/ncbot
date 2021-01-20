@@ -8,10 +8,10 @@
     <!-- TradingView Widget END -->
 
     <h1 class="has-text-primary is-size-3 is-size-4-mobile">
-      BTCUSDT: <span class="has-text-weight-bold">${{ socket.message }}</span>
+      BTCUSDT: <span class="has-text-weight-bold">${{ socket.message.lastPrice }}</span>
     </h1>
 
-    Wallet:
+    Holding:
     <strong>BTC:</strong> {{ balances.BTC && balances.BTC.available ? balances.BTC.available : ''}}
     <strong>USDT:</strong> ${{ balances.USDT && balances.USDT.available ? parseFloat(balances.USDT.available).toFixed(2) : ''}}
 
@@ -92,7 +92,7 @@ export default {
     },
 
     async getBalances() {
-      let balancesRes = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/getBalances`, {
+      const balancesRes = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/getBalances`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

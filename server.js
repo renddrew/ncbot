@@ -9,7 +9,7 @@ const utils = require('./backend/utils');
 // Create web socket server on top of a regular http server
 // IMPORTANT declare port elsewhere to avoid erris with port un use for both servers
 const wss = new WSServer({
-  server,
+  server
 });
 
 // Also mount the app here
@@ -21,32 +21,31 @@ const binance = new Binance().options({
 });
 
 // binance.bookTickers('BTCUSDT', (error, ticker) => {
-//     console.info("bookTickers", ticker);
+//   console.info("bookTickers", ticker);
 // });
 
-let data = 'balls';
-
-binance.websockets.chart("BTCUSDT", "1m", (symbol, interval, chart) => {
-  let tick = binance.last(chart);
+let lastPrice = '22';
+binance.websockets.chart('BTCUSDT', '1m', (symbol, interval, chart) => {
+  const tick = binance.last(chart);
   const last = chart[tick].close;
   // console.info(chart);
   // Optionally convert 'chart' object to array:
   // let ohlc = binance.ohlc(chart);
   // console.info(symbol, ohlc);
   // console.info(symbol+" last price: "+last)
-  data = utils.formatNum(last, 2);
+  lastPrice = utils.formatNum(last, 2);
 });
 
-wss.on('connection', ws => {
-  wss.clients.forEach(client => {
+wss.on('connection', (ws) => {
+  wss.clients.forEach((client) => {
     setInterval(() => {
-      client.send(JSON.stringify(data));
+      client.send(JSON.stringify({ lastPrice }));
     }, 50);
   });
   // ws.on('message', incoming(data => {
   // });
 });
 
-server.listen(process.env.PORT, function() {
-  console.log(`http/ws server listening on 8080`);
+server.listen(process.env.PORT, () => {
+  console.log('http/ws server listening on 8080');
 });
