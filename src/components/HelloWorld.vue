@@ -9,7 +9,10 @@
 
     <h1 class="has-text-primary is-size-2">BTCUSDT: <span class="has-text-weight-bold">{{ socket.message }}</span></h1>
 
-    <b-table :data="trades" :Xcolumns="columns">
+    <strong>BTC:</strong> {{ balances.BTC && balances.BTC.available ? balances.BTC.available : ''}}
+    <strong>USDT:</strong> ${{ balances.USDT && balances.USDT.available ? parseFloat(balances.USDT.available).toFixed(2) : ''}}
+
+    <b-table :data="trades">
       <b-table-column field="isBuyer" v-slot="props">
           <span :class="['tag', props.row.isBuyer ? 'is-success' : 'is-danger']">
               {{ props.row.isBuyer ? 'Buy' : 'Sell' }}
@@ -56,28 +59,7 @@ export default {
     return {
       msg: null,
       trades: [],
-      columns: [{
-        field: 'action',
-        label: '',
-        width: '40',
-      },{
-        field: 'niceTime',
-        label: 'Date',
-        cellClass: 'text-align-left'
-      },{
-        field: 'qty',
-        label: 'BTC',
-        cellClass: 'text-align-left'
-      },{
-        field: 'price',
-        label: 'Price',
-        cellClass: 'text-align-left'
-      },{
-        field: 'quoteQty',
-        label: 'Order $',
-        center: false,
-        cellClass: 'text-align-left'
-      }]
+      balances: []
     }
   },
 
@@ -88,7 +70,7 @@ export default {
   },
 
   methods: {
-    async getTrades () {
+    async getTrades() {
       let tradeReq = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/getTrades`, {
         method: 'POST',
         headers: {
@@ -103,6 +85,19 @@ export default {
       this.trades = trades;
     },
 
+    async getBalances() {
+      let balancesRes = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/getBalances`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      })).json();
+
+      let balances = balancesRes.balances || {};
+      
+      this.balances = balances;
+    },
+
     niceTime(ts) {
       return moment.unix(ts/1000).format('MMM Do YYYY h:mm a')
     },
@@ -110,6 +105,7 @@ export default {
 
   mounted() {
     this.getTrades();
+    this.getBalances();
 
      new TradingView.widget({
       "width": '100%',
@@ -134,14 +130,10 @@ export default {
 
 </script>
 
-<style  lang="scss">
+<style lang="scss">
   h1 {
     padding: 20px 0 10px
   }
-</style>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="scss">
 
 .table {
   max-width:600px;

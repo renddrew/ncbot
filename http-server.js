@@ -30,8 +30,6 @@ app.post('/getTrades', (req, res) => {
 
       // always add item to grouped trades, whether has match or not yet
       
-      const lastTrade = trades[i - 1];
-
       if ((lastTradeId !== trades[i].orderId) && i !== 0) {
 
         // do averaging for each grouped trade item
@@ -67,6 +65,12 @@ app.post('/getTrades', (req, res) => {
     }
 
     res.send({ trades: filteredTrades, tradesAll: trades });
+  });
+});
+
+app.post('/getBalances', (req, res) => {
+  binance.balance((error, balances) => {
+    res.send({ balances });
   });
 });
 
