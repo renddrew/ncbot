@@ -7,24 +7,40 @@
     </div>
     <!-- TradingView Widget END -->
 
-    <h1>BTCUSDT: {{ socket.message }}</h1>
-    <ul>
-      <li v-for="(t, i) in trades">
-        <strong>{{ t.isBuyer ? 'Buy' : 'Sell'}}:</strong> {{niceTime(t.time)}} - {{t.qty}} - {{t.price}} - {{t.quoteQty}}
-      </li>
-    </ul>
+    <h1 class="has-text-primary is-size-2">BTCUSDT: <span class="has-text-weight-bold">{{ socket.message }}</span></h1>
+
+    <b-table :data="trades" :Xcolumns="columns">
+      <b-table-column field="isBuyer" v-slot="props">
+          <span :class="['tag', props.row.isBuyer ? 'is-success' : 'is-danger']">
+              {{ props.row.isBuyer ? 'Buy' : 'Sell' }}
+          </span>
+      </b-table-column>
+      <b-table-column field="niceTime" v-slot="props" label="Date">
+        {{ props.row.niceTime }}
+      </b-table-column>
+      <b-table-column field="qty" v-slot="props" label="Qty BTC">
+        {{ props.row.qty }}
+      </b-table-column>
+      <b-table-column field="price" v-slot="props" label="BTC rice">
+        ${{ props.row.price }}
+      </b-table-column>
+      <b-table-column field="quoteQty" v-slot="props" label="Trade Amt">
+        ${{ props.row.quoteQty }}
+      </b-table-column>
+    </b-table>
+
   </div>
 </template>
 
 <script>
 
-import store from '@/store'
+import store from '@/store';
 var moment = require('moment');
 import Vue from 'vue';
 import Vuex from 'vuex';
 import VueNativeSock from 'vue-native-websocket'
 
-Vue.use(VueNativeSock, process.env.VUE_APP_WS_URL, { 
+Vue.use(VueNativeSock, process.env.VUE_APP_WS_URL, {
   store: store,
   reconnection: true, // (Boolean) whether to reconnect automatically (false)
   reconnectionAttempts: 5, // (Number) number of reconnection attempts before giving up (Infinity),
@@ -39,7 +55,29 @@ export default {
   data() {
     return {
       msg: null,
-      trades: []
+      trades: [],
+      columns: [{
+        field: 'action',
+        label: '',
+        width: '40',
+      },{
+        field: 'niceTime',
+        label: 'Date',
+        cellClass: 'text-align-left'
+      },{
+        field: 'qty',
+        label: 'BTC',
+        cellClass: 'text-align-left'
+      },{
+        field: 'price',
+        label: 'Price',
+        cellClass: 'text-align-left'
+      },{
+        field: 'quoteQty',
+        label: 'Order $',
+        center: false,
+        cellClass: 'text-align-left'
+      }]
     }
   },
 
@@ -56,8 +94,13 @@ export default {
         headers: {
           'Content-Type': 'application/json'
         },
-      })).json()
-      this.trades = Array.isArray(tradeReq.trades) ? tradeReq.trades : []
+      })).json();
+
+      let trades = Array.isArray(tradeReq.trades) ? tradeReq.trades : [];
+      for (let i = 0; i < trades.length; i++) {
+        trades[i].niceTime = moment.unix(trades[i].time/1000).format('MMM Do YYYY h:mm a');
+      }
+      this.trades = trades;
     },
 
     niceTime(ts) {
@@ -91,8 +134,27 @@ export default {
 
 </script>
 
+<style  lang="scss">
+  h1 {
+    padding: 20px 0 10px
+  }
+</style>
+
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
+<style lang="scss">
+
+.table {
+  max-width:600px;
+  margin: 0 auto;
+ td{
+  &.text-align-left {
+    span {
+      display: block;
+      text-align:left
+    }
+  }
+ }
+}
 
 #tradingview_3194a iframe {
 
