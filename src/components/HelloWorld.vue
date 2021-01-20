@@ -7,12 +7,18 @@
     </div>
     <!-- TradingView Widget END -->
 
-    <h1 class="has-text-primary is-size-2">BTCUSDT: <span class="has-text-weight-bold">{{ socket.message }}</span></h1>
+    <h1 class="has-text-primary is-size-3 is-size-4-mobile">
+      BTCUSDT: <span class="has-text-weight-bold">${{ socket.message }}</span>
+    </h1>
 
+    Wallet:
     <strong>BTC:</strong> {{ balances.BTC && balances.BTC.available ? balances.BTC.available : ''}}
     <strong>USDT:</strong> ${{ balances.USDT && balances.USDT.available ? parseFloat(balances.USDT.available).toFixed(2) : ''}}
 
-    <b-table :data="trades">
+    <br>
+    <br>
+
+    <b-table :data="trades" :mobileCards=false>
       <b-table-column field="isBuyer" v-slot="props">
           <span :class="['tag', props.row.isBuyer ? 'is-success' : 'is-danger']">
               {{ props.row.isBuyer ? 'Buy' : 'Sell' }}
@@ -80,7 +86,7 @@ export default {
 
       let trades = Array.isArray(tradeReq.trades) ? tradeReq.trades : [];
       for (let i = 0; i < trades.length; i++) {
-        trades[i].niceTime = moment.unix(trades[i].time/1000).format('MMM Do YYYY h:mm a');
+        trades[i].niceTime = moment.unix(trades[i].time/1000).format('DD/MM/YY h:mm a');
       }
       this.trades = trades;
     },
@@ -130,26 +136,24 @@ export default {
 
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
   h1 {
-    padding: 20px 0 10px
+    padding: 10px
   }
+</style>
 
-.table {
-  max-width:600px;
-  margin: 0 auto;
- td{
-  &.text-align-left {
-    span {
-      display: block;
-      text-align:left
+<style lang="scss">
+  .table {
+    max-width:600px;
+    margin: 0 auto;
+  td{
+    &.text-align-left {
+      span {
+        display: block;
+        text-align:left
+      }
     }
   }
- }
-}
-
-#tradingview_3194a iframe {
-
 }
 
 </style>
