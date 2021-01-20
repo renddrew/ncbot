@@ -6,6 +6,8 @@ const utils = require('./backend/utils');
 
 // https://stackoverflow.com/questions/34808925/express-and-websocket-listening-on-the-same-port/34838031
 
+// https://www.npmjs.com/package/node-binance-api
+
 // Create web socket server on top of a regular http server
 // IMPORTANT declare port elsewhere to avoid erris with port un use for both servers
 const wss = new WSServer({

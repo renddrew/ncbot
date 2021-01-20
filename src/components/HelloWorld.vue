@@ -16,6 +16,11 @@
     <strong>USDT:</strong> ${{ balances.USDT && balances.USDT.available ? parseFloat(balances.USDT.available).toFixed(2) : ''}}
 
     <br>
+
+    Wallet Value:
+     <strong>BTC:</strong> {{ totalValues.btcTotal }}
+     <strong>USDT:</strong> ${{ totalValues.usdtTotal }}
+    <br>
     <br>
 
     <b-table :data="trades" :mobileCards=false>
@@ -50,11 +55,11 @@ import Vuex from 'vuex';
 import VueNativeSock from 'vue-native-websocket'
 
 Vue.use(VueNativeSock, process.env.VUE_APP_WS_URL, {
-  store: store,
+  store,
   reconnection: true, // (Boolean) whether to reconnect automatically (false)
   reconnectionAttempts: 5, // (Number) number of reconnection attempts before giving up (Infinity),
   reconnectionDelay: 3000, // (Number) how long to initially wait before attempting a new (1000)
-  format: 'json' 
+  format: 'json'
 })
 
 import { mapState } from 'vuex';
@@ -65,7 +70,7 @@ export default {
     return {
       msg: null,
       trades: [],
-      balances: []
+      balances: [],
     }
   },
 
@@ -73,6 +78,15 @@ export default {
     ...mapState([
       'socket'
     ]),
+    
+    totalValues() {
+      const lastPrice = parseFloat(this.socket.message.lastPrice);
+      const btcWallet = this.balances.BTC && this.balances.BTC.available ? parseFloat(this.balances.BTC.available) : 0;
+      const usdtWallet = this.balances.USDT && this.balances.USDT.available ? parseFloat(this.balances.USDT.available) : 0;
+      const btcTotal = ((usdtWallet / lastPrice) + btcWallet).toFixed(5);
+      const usdtTotal = ((lastPrice * btcWallet) + usdtWallet).toFixed(2);
+      return { btcTotal, usdtTotal };
+    }
   },
 
   methods: {
