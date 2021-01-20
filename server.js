@@ -1,19 +1,20 @@
-let WSServer = require('ws').Server;
-let server = require('http').createServer();
-let app = require('./http-server');
+const WSServer = require('ws').Server;
+const server = require('http').createServer();
+const Binance = require('node-binance-api');
+const app = require('./http-server');
+const utils = require('./backend/utils');
 
-//https://stackoverflow.com/questions/34808925/express-and-websocket-listening-on-the-same-port/34838031
+// https://stackoverflow.com/questions/34808925/express-and-websocket-listening-on-the-same-port/34838031
 
 // Create web socket server on top of a regular http server
 // IMPORTANT declare port elsewhere to avoid erris with port un use for both servers
-let wss = new WSServer({
-  server: server,
+const wss = new WSServer({
+  server,
 });
 
 // Also mount the app here
 server.on('request', app);
 
-const Binance = require('node-binance-api');
 const binance = new Binance().options({
   APIKEY: 'i4dMaSxv6iCaZSR8tPUJCQxBmfJVOYRG37enQJHMHMx05JKDSLIdAFX7hxQOo09M',
   APISECRET: 'f8Y0HqCDu8lFpXOhvuNYGafmd2t27IRmFJqctXsFhjM91gbbP0GuN2HLuD206CPt'
@@ -33,7 +34,7 @@ binance.websockets.chart("BTCUSDT", "1m", (symbol, interval, chart) => {
   // let ohlc = binance.ohlc(chart);
   // console.info(symbol, ohlc);
   // console.info(symbol+" last price: "+last)
-  data = last;
+  data = utils.formatNum(last, 2);
 });
 
 wss.on('connection', function connection (ws) {

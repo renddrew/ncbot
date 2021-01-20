@@ -2,15 +2,15 @@
   <div class="hello">
 
     <!-- TradingView Widget BEGIN -->
-<div class="tradingview-widget-container">
-  <div id="tradingview_3194a"></div>
-</div>
-<!-- TradingView Widget END -->
+    <div class="tradingview-widget-container">
+      <div id="tradingview_3194a"></div>
+    </div>
+    <!-- TradingView Widget END -->
 
     <h1>BTCUSDT: {{ socket.message }}</h1>
     <ul>
       <li v-for="(t, i) in trades">
-        {{niceTime(t.time)}} - {{t.qty}} - {{t.price}} - {{t.quoteQty}}
+        <strong>{{ t.isBuyer ? 'Buy' : 'Sell'}}:</strong> {{niceTime(t.time)}} - {{t.qty}} - {{t.price}} - {{t.quoteQty}}
       </li>
     </ul>
   </div>
