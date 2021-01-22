@@ -35,7 +35,7 @@
       <b-table-column field="qty" v-slot="props" label="Qty BTC">
         {{ props.row.qty }}
       </b-table-column>
-      <b-table-column field="price" v-slot="props" label="BTC rice">
+      <b-table-column field="price" v-slot="props" label="BTC Price">
         ${{ props.row.price }}
       </b-table-column>
       <b-table-column field="quoteQty" v-slot="props" label="Trade Amt">
@@ -163,7 +163,7 @@ export default {
 
 <style lang="scss">
   .table {
-    width:600px;
+    width:800px!important;
     margin: 0 auto;
     max-width:100%;
   td{
