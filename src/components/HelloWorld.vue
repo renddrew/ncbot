@@ -7,12 +7,12 @@
     </div>
     <!-- TradingView Widget END -->
 
-    <h1 class="has-text-primary is-size-3 is-size-4-mobile">
+    <h1 class="has-text-primary is-size-3 is-size-4-mobile" @click=reload>
       BTCUSDT: <span class="has-text-weight-bold">${{ socket.message.lastPrice }}</span>
     </h1>
 
     Holding:
-    <strong>BTC:</strong> {{ balances.BTC && balances.BTC.available ? balances.BTC.available : ''}}
+    <strong>BTC:</strong> {{ balances.BTC && balances.BTC.available ? parseFloat(balances.BTC.available).toFixed(6) : ''}}
     <strong>USDT:</strong> ${{ balances.USDT && balances.USDT.available ? parseFloat(balances.USDT.available).toFixed(2) : ''}}
 
     <br>
@@ -23,7 +23,7 @@
     <br>
     <br>
 
-    <b-table :data="trades" :mobileCards=false>
+    <b-table :data="trades" :mobileCards=false class="is-size-7-mobile">
       <b-table-column field="isBuyer" v-slot="props">
           <span :class="['tag', props.row.isBuyer ? 'is-success' : 'is-danger']">
               {{ props.row.isBuyer ? 'Buy' : 'Sell' }}
@@ -100,9 +100,10 @@ export default {
 
       let trades = Array.isArray(tradeReq.trades) ? tradeReq.trades : [];
       for (let i = 0; i < trades.length; i++) {
-        trades[i].niceTime = moment.unix(trades[i].time/1000).format('DD/MM/YY h:mm a');
+        trades[i].niceTime = moment.unix(trades[i].time/1000).format('DD/M h:mma');
       }
       this.trades = trades;
+      this.$buefy.snackbar.open({message:'got trades', duration: 500});
     },
 
     async getBalances() {
@@ -112,15 +113,19 @@ export default {
           'Content-Type': 'application/json'
         },
       })).json();
-
+      this.$buefy.snackbar.open({message:'got balances', duration: 500});
       let balances = balancesRes.balances || {};
-      
       this.balances = balances;
     },
 
     niceTime(ts) {
       return moment.unix(ts/1000).format('MMM Do YYYY h:mm a')
     },
+
+    reload() {
+      this.getTrades();
+      this.getBalances();
+    }
   },
 
   mounted() {
@@ -158,9 +163,11 @@ export default {
 
 <style lang="scss">
   .table {
-    max-width:600px;
+    width:600px;
     margin: 0 auto;
+    max-width:100%;
   td{
+    padding: 6px 2px!important;
     &.text-align-left {
       span {
         display: block;
