@@ -163,9 +163,9 @@ export default {
 
 <style lang="scss">
   .table {
-    width:800px!important;
+    width:100%!important;
     margin: 0 auto;
-    max-width:100%;
+    max-width:800px!important;
   td{
     padding: 6px 2px!important;
     &.text-align-left {
