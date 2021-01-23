@@ -18,7 +18,7 @@ const SavePriceHistory = class {
   }
 
   setDateFile() {
-    const dateFile = moment().format('YYYY-MM-DD-H-mm');
+    const dateFile = moment().format('YYYY-MM-DD-H');
     const dateFileStr = `./backend/db/btcusdt/${dateFile}.stormdb`;
     const dbEngine = new StormDB.localFileEngine(dateFileStr, {
       async: true,
