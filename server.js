@@ -1,13 +1,16 @@
-const StormDB = require('stormdb');
 const WSServer = require('ws').Server;
 const server = require('http').createServer();
 const Binance = require('node-binance-api');
 const app = require('./http-server');
 const utils = require('./backend/utils');
+const SavePriceHistory = require('./backend/save-price-history');
 
 // https://stackoverflow.com/questions/34808925/express-and-websocket-listening-on-the-same-port/34838031
 
 // https://www.npmjs.com/package/node-binance-api
+
+// https://www.npmjs.com/package/stormdb
+
 
 // Create web socket server on top of a regular http server
 // IMPORTANT declare port elsewhere to avoid erris with port un use for both servers
@@ -17,12 +20,6 @@ const wss = new WSServer({
 
 // Also mount the app here
 server.on('request', app);
-
-const engine = new StormDB.localFileEngine('./backend/db/btcusdt/history.stormdb', {
-  async: true,
-});
-const priceHistDb = new StormDB(engine);
-
 
 const binance = new Binance().options({
   APIKEY: 'i4dMaSxv6iCaZSR8tPUJCQxBmfJVOYRG37enQJHMHMx05JKDSLIdAFX7hxQOo09M',
@@ -59,13 +56,10 @@ server.listen(process.env.PORT, () => {
   console.log('http/ws server listening on 8080');
 });
 
-function savePriceHistory() {
-  priceHistDb.default({ history: [] });
-  const time = (new Date()).getTime();
-  priceHistDb.get('history').push({ t: time, p: lastPrice });
-  priceHistDb.save(); // async
-}
 
-setInterval(savePriceHistory, 1000);
+const ph = new SavePriceHistory();
+setInterval(() => {
+  ph.addPriceHistory(lastPrice);
+}, 1000);
 
 
