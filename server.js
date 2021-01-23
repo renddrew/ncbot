@@ -18,7 +18,7 @@ const wss = new WSServer({
 // Also mount the app here
 server.on('request', app);
 
-const engine = new StormDB.localFileEngine('./backend/db/trades.stormdb', {
+const engine = new StormDB.localFileEngine('./backend/db/btcusdt/history.stormdb', {
   async: true,
 });
 const priceHistDb = new StormDB(engine);
@@ -60,9 +60,9 @@ server.listen(process.env.PORT, () => {
 });
 
 function savePriceHistory() {
-  priceHistDb.default({ btcusdt: [] });
+  priceHistDb.default({ history: [] });
   const time = (new Date()).getTime();
-  priceHistDb.get('btcusdt').push({ t: time, p: lastPrice });
+  priceHistDb.get('history').push({ t: time, p: lastPrice });
   priceHistDb.save(); // async
 }
 
