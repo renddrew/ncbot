@@ -1,3 +1,4 @@
+const StormDB = require('stormdb');
 const WSServer = require('ws').Server;
 const server = require('http').createServer();
 const Binance = require('node-binance-api');
@@ -16,6 +17,12 @@ const wss = new WSServer({
 
 // Also mount the app here
 server.on('request', app);
+
+const engine = new StormDB.localFileEngine('./backend/db/trades.stormdb', {
+  async: true,
+});
+const priceHistDb = new StormDB(engine);
+
 
 const binance = new Binance().options({
   APIKEY: 'i4dMaSxv6iCaZSR8tPUJCQxBmfJVOYRG37enQJHMHMx05JKDSLIdAFX7hxQOo09M',
@@ -51,3 +58,14 @@ wss.on('connection', (ws) => {
 server.listen(process.env.PORT, () => {
   console.log('http/ws server listening on 8080');
 });
+
+function savePriceHistory() {
+  priceHistDb.default({ btcusdt: [] });
+  const time = (new Date()).getTime();
+  priceHistDb.get('btcusdt').push({ t: time, p: lastPrice });
+  priceHistDb.save(); // async
+}
+
+setInterval(savePriceHistory, 1000);
+
+

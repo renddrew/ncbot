@@ -48,11 +48,11 @@
 
 <script>
 
-import store from '@/store';
-var moment = require('moment');
 import Vue from 'vue';
-import Vuex from 'vuex';
-import VueNativeSock from 'vue-native-websocket'
+import VueNativeSock from 'vue-native-websocket';
+import store from '@/store';
+const moment = require('moment');
+
 
 Vue.use(VueNativeSock, process.env.VUE_APP_WS_URL, {
   store,
@@ -76,9 +76,9 @@ export default {
 
   computed: {
     ...mapState([
-      'socket'
+      'socket',
     ]),
-    
+
     totalValues() {
       const lastPrice = parseFloat(this.socket.message.lastPrice);
       const btcWallet = this.balances.BTC && this.balances.BTC.available ? parseFloat(this.balances.BTC.available) : 0;
