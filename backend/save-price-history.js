@@ -1,6 +1,7 @@
 const StormDB = require('stormdb');
 const cron = require('node-cron');
 const moment = require('moment');
+const fs = require('fs');
 const utils = require('./utils');
 
 // https://www.npmjs.com/package/stormdb
@@ -19,7 +20,9 @@ const SavePriceHistory = class {
 
   setDateFile() {
     const dateFile = moment().format('YYYY-MM-DD-H');
-    const dateFileStr = `./backend/db/btcusdt/${dateFile}.stormdb`;
+    const dirpath = './backend/db/btcusdt';
+    fs.mkdirSync(dirpath, { recursive: true });
+    const dateFileStr = `${dirpath}/${dateFile}.stormdb`;
     const dbEngine = new StormDB.localFileEngine(dateFileStr, {
       async: true,
     });
