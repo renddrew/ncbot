@@ -9,11 +9,14 @@ const utils = require('./utils');
 const GetRanges = class {
 
   constructor() {
-    let timeNow = new Date().getTime();
-    let short = 60*1000;
-    let medium = 60*2*1000;
-    let long = 60*4*1000;
+    let timeNow = parseInt((new Date()).getTime());
+    let shortPeriod = timeNow - (60*1000);
+    let mediumPeriod = timeNow - (60*2*1000);
+    let longPeriod = timeNow - (60*4*1000);
     let allPeriodHist = [];
+    let shortPeriodHist = [];
+    let mediumPeriodHist = [];
+    let longPeriodHist = [];
     this.getPeriodHistory();
   }
 
@@ -32,6 +35,21 @@ const GetRanges = class {
       if (!vals || !vals.length) continue;
       this.allPeriodHist = this.allPeriodHist.concat(vals);
     }
+
+    let shortMaxPrice = 0;
+    let shortMinPrice = 0;
+    let mediumMaxPrice = 0;
+    let mediumMinPrice = 0;
+    let longMaxPrice = 0;
+    let longMinPrice = 0;
+    for (let ti = 0; ti < this.allPeriodHist.length; ti++) {
+      if (this.allPeriodHist[ti].t > this.shortPeriod ) {
+        this.shortPeriodHist.push(allPeriodHist[ti]);
+        // check and update in and max prices
+
+      }
+    }
+
   }
 
 }
