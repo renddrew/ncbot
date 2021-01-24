@@ -64,6 +64,49 @@ const binanceRequests = {
     });
   },
 
+  syncTradeHist(groupedTrades) {
+
+    /*
+    return new Promise((resolve) => {
+      const dateFileStr = './backend/db/tradeHist.stormdb';
+      const dbEngine = new StormDB.localFileEngine(dateFileStr, {
+        async: true,
+      });
+      const tradeDb = new StormDB(dbEngine);
+      const savedTrades = tradeDb.get('trades').value();
+      let missingTrades = [];
+
+      for (let i = 0; i < groupedTrades.length; i++) {
+        let hasSaved = false;
+        for (let si = 0; si < savedTrades.length; si++) {
+          if (groupedTrades[i].orderId === savedTrades[si]) {
+            hasSaved = true;
+          }
+        }
+        if (!hasSaved) {
+          missingTrades.push(groupedTrades[i]);
+        }
+      }
+
+      missingTrades.sort((a, b) => {
+        return a.time > b.time;
+      });
+
+      /*
+      const timeNow = new Date().getTime();
+      if (missingTrades[missingTrades.length]).time > (timeNow + (60*1000)) {
+        const balances = await getBalances();
+        // calculate balance in USD using BTC and USDT and add to trade then add amount to trade stats
+      }
+
+      tradeDb.get('trades').push(missingTrades);
+      await tradeDb.save();
+
+      resolve();
+    });
+    */
+  },
+
   getBalances() {
     return new Promise((resolve) => {
       binance.balance((error, balances) => {

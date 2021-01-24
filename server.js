@@ -4,6 +4,7 @@ const Binance = require('node-binance-api');
 const app = require('./http-server');
 const utils = require('./backend/utils');
 const SavePriceHistory = require('./backend/save-price-history');
+const GetRanges = require('./backend/get-ranges');
 
 // https://stackoverflow.com/questions/34808925/express-and-websocket-listening-on-the-same-port/34838031
 
@@ -56,10 +57,11 @@ server.listen(process.env.PORT, () => {
   console.log('http/ws server listening on 8080');
 });
 
-
+// save price history
 const ph = new SavePriceHistory();
 setInterval(() => {
   ph.addPriceHistory(lastPrice);
 }, 1000);
 
+const ranges = new GetRanges();
 
