@@ -12,8 +12,14 @@
     </h1>
 
     Holding:
-    <strong>BTC:</strong> {{ balances.BTC && balances.BTC.available ? parseFloat(balances.BTC.available).toFixed(6) : ''}}
-    <strong>USDT:</strong> ${{ balances.USDT && balances.USDT.available ? parseFloat(balances.USDT.available).toFixed(2) : ''}}
+    <strong>BTC:</strong> {{ balances.BTC && balances.BTC.available ? (parseFloat(balances.BTC.available) + parseFloat(balances.BTC.onOrder)).toFixed(6) : ''}}
+    <strong>USDT:</strong> ${{ balances.USDT && balances.USDT.available ? (parseFloat(balances.USDT.available) + parseFloat(balances.USDT.onOrder)).toFixed(2) : ''}}
+
+    <br> 
+
+    On Order:
+    <strong>BTC:</strong> {{ balances.BTC && balances.BTC.onOrder ? parseFloat(balances.BTC.onOrder).toFixed(6) : ''}}
+    <strong>USDT:</strong> ${{ balances.USDT && balances.USDT.onOrder ? parseFloat(balances.USDT.onOrder).toFixed(2) : ''}}
 
     <br>
 
@@ -82,8 +88,8 @@ export default {
 
     totalValues() {
       const lastPrice = parseFloat(this.socket.message.lastPrice);
-      const btcWallet = this.balances.BTC && this.balances.BTC.available ? parseFloat(this.balances.BTC.available) : 0;
-      const usdtWallet = this.balances.USDT && this.balances.USDT.available ? parseFloat(this.balances.USDT.available) : 0;
+      const btcWallet = this.balances.BTC && this.balances.BTC.available ? parseFloat(this.balances.BTC.available) + parseFloat(this.balances.BTC.onOrder) : 0;
+      const usdtWallet = this.balances.USDT && this.balances.USDT.available ? parseFloat(this.balances.USDT.available) + parseFloat(this.balances.USDT.onOrder) : 0;
       const btcTotal = ((usdtWallet / lastPrice) + btcWallet).toFixed(5);
       const usdtTotal = ((lastPrice * btcWallet) + usdtWallet).toFixed(2);
       return { btcTotal, usdtTotal };
