@@ -20,7 +20,7 @@ const GetRanges = class {
     this.getPeriodHistory();
   }
 
-  getPeriodHistory(){
+  getPeriodHistory() {
     const dateFile = moment().format('YYYY-MM-DD');
     const currentHour = parseInt(moment().format('H'));
     const dateFileDir = './backend/db/btcusdt';
