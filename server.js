@@ -64,4 +64,6 @@ setInterval(() => {
 }, 1000);
 
 const ranges = new GetRanges();
+const rangeVals = ranges.getPeriodHistory();
+console.log(rangeVals);
 
