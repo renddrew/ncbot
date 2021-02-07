@@ -40,7 +40,11 @@ deploy:
       --exclude="*"
       $PWD/ root@157.230.215.44:/var/www/html
     # install packages necessary for backend
-    - ssh root@157.230.215.44 "cd ~/var/www/html && npm install && pm2 restart server"
+    - ssh root@157.230.215.44 "
+        cd /var/www/html/ &&
+        npm install &&
+        pm2 restart server
+    "
   artifacts:
     paths:
      - node_modules/
