@@ -7,7 +7,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --no-clean",
     "lint": "vue-cli-service lint",
-    "backend": "PORT=8080 node server.js"
+    "backend": "node server.js"
   },
   "dependencies": {
     "buefy": "^0.9.4",
