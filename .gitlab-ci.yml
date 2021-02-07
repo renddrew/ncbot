@@ -25,7 +25,7 @@ deploy:
     # update frontend files in server
     - rsync -avz
       --delete
-      $PWD/dist/ root@157.230.215.44:/var/www/html/
+      $PWD/dist/ root@157.230.215.44:/var/www/html/dist
     # update backend dir files
     - rsync -avz
       --delete
@@ -40,6 +40,7 @@ deploy:
       --exclude="*"
       $PWD/ root@157.230.215.44:/var/www/html
     # install packages necessary for backend
+    - ssh root@157.230.215.44 "npm install"
   artifacts:
     paths:
      - node_modules/
