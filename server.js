@@ -53,7 +53,7 @@ wss.on('connection', (ws) => {
   // });
 });
 
-server.listen(process.env.PORT, () => {
+server.listen(8080, () => {
   console.log('http/ws server listening on 8080');
 });
 
