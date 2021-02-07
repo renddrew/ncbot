@@ -20,8 +20,12 @@ deploy:
     - apt-get -y install rsync
     - rsync -avz
       --delete
-      --exclude backend/db
-      $PWD/ root@157.230.215.44:/var/www/html/
+      --exclude db
+      $PWD/backend root@157.230.215.44:/var/www/html/backend
+    - rsync -avz
+      $PWD/backend/server.js root@157.230.215.44:/var/www/html
+    - rsync -avz
+      $PWD/backend/http-server.js root@157.230.215.44:/var/www/html
     # - npm install
     # - npm run build
     # - rsync -avz
@@ -29,9 +33,8 @@ deploy:
     #   $PWD/dist/ root@157.230.215.44:/var/www/html/
     
   artifacts:
-  artifacts:
     paths:
-      - node_modules/
+      # - node_modules/
   environment:
     name: production
     url: https://example.com
