@@ -33,14 +33,13 @@ deploy:
       $PWD/backend/ root@157.230.215.44:/var/www/html/backend
     # update backend entry files
     - rsync -avz
-      --exclude="*"
       --include="server.js"
       --include="http-server.js"
       --include="package.json"
       --include="package-lock.json"
+      --exclude="*"
       $PWD/ root@157.230.215.44:/var/www/html
     # install packages necessary for backend
-
   artifacts:
     paths:
      - node_modules/
