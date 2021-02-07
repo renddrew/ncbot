@@ -43,8 +43,7 @@ deploy:
     - ssh root@157.230.215.44 "
         cd ../var/www/html/ &&
         npm install &&
-        pm2 restart server
-    "
+        pm2 restart server"
   artifacts:
     paths:
      - node_modules/
