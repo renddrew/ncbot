@@ -21,7 +21,7 @@ deploy:
    # - npm install
     - npm run build
     - rsync -av --delete  "$PWD/dist" 
-    root@157.230.215.44/var/www/html/
+      root@157.230.215.44/var/www/html/
   artifacts:
     paths:
       - node_modules/
