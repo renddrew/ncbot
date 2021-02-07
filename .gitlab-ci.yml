@@ -30,7 +30,7 @@ deploy:
     - rsync -avz
       --delete
       --exclude db
-      $PWD/backend root@157.230.215.44:/var/www/html/backend
+      $PWD/backend/ root@157.230.215.44:/var/www/html/backend
     # update backend entry files
     - rsync -avz
       --exclude="*"
@@ -41,7 +41,8 @@ deploy:
       $PWD/backend root@157.230.215.44:/var/www/html
     # install packages necessary for backend
     - npm install
-    - sudo -u nodejs pm2 start server.js -- --port=8080
+    - ssh root@157.230.215.44 && sudo -u nodejs pm2 start server.js -- --port=8080
+
   artifacts:
     paths:
      - node_modules/
