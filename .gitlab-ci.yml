@@ -1,0 +1,17 @@
+image: node:latest
+
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  script:
+    - npm install && npm run build && rsync -av --delete public /var/www/html
+  artifacts:
+    paths:
+      - node_modules/
+  environment:
+    name: production
+    url: https://example.com
+  only:
+    - master
