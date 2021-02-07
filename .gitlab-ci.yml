@@ -3,10 +3,24 @@ image: node:latest
 stages:
   - deploy
 
+before_script:
+  - apt-get update -y
+  - apt-get -y install rsync
+  Setup SSH deploy keys
+  - 'which ssh-agent || ( apt-get install -qq openssh-client )'
+  - eval $(ssh-agent -s)
+  - ssh-add <(echo "$SSH_PRIVATE_KEY")
+  # - mkdir -p ~/.ssh
+  # - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    
 deploy:
   stage: deploy
   script:
-    - npm install && npm run build && rsync -av --delete public /var/www/html
+    - apt-get update -y
+    - apt-get -y install rsync
+    - npm install
+    - npm run build
+    - rsync -av --delete public root@157.230.215.44/var/www/html
   artifacts:
     paths:
       - node_modules/
