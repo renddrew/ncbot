@@ -20,7 +20,8 @@ deploy:
     - apt-get -y install rsync
     - npm install
     - npm run build
-    - rsync -avrc --delete $PWD/dist root@157.230.215.44/var/www/html/
+    - rsync -avrc --delete $PWD/dist/ root@157.230.215.44/var/www/html/
+
   artifacts:
     paths:
       - node_modules/
