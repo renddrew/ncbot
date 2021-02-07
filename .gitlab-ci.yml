@@ -23,7 +23,7 @@ deploy:
     - rsync -avz
       --delete 
       --exclude '/backend/db'
-      $PWD/dist root@157.230.215.44:/var/www/html/
+      $PWD/ root@157.230.215.44:/var/www/html/
   artifacts:
     paths:
       - node_modules/
