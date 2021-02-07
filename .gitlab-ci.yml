@@ -23,18 +23,16 @@ deploy:
       --exclude db
       $PWD/backend root@157.230.215.44:/var/www/html/backend
     - rsync -avz
-      $PWD/backend/server.js root@157.230.215.44:/var/www/html
+      $PWD/server.js root@157.230.215.44:/var/www/html
     - rsync -avz
-      $PWD/backend/http-server.js root@157.230.215.44:/var/www/html
-    # - npm install
-    # - npm run build
-    # - rsync -avz
-    #   --delete
-    #   $PWD/dist/ root@157.230.215.44:/var/www/html/
-    
+      $PWD/http-server.js root@157.230.215.44:/var/www/html
+    - npm install
+    - npm run build
+    - rsync -avz
+      $PWD/dist/ root@157.230.215.44:/var/www/html/
   artifacts:
     paths:
-      # - node_modules/
+     - node_modules/
   environment:
     name: production
     url: https://example.com
