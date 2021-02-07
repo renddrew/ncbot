@@ -38,10 +38,8 @@ deploy:
       --include="http-server.js"
       --include="package.json"
       --include="package-lock.json"
-      $PWD/backend root@157.230.215.44:/var/www/html
+      $PWD/ root@157.230.215.44:/var/www/html
     # install packages necessary for backend
-    - npm install
-    - ssh root@157.230.215.44 && sudo -u nodejs pm2 start server.js -- --port=8080
 
   artifacts:
     paths:
