@@ -33,9 +33,14 @@ deploy:
       $PWD/backend root@157.230.215.44:/var/www/html/backend
     # update backend entry files
     - rsync -avz
-      $PWD/server.js root@157.230.215.44:/var/www/html
-    - rsync -avz
-      $PWD/http-server.js root@157.230.215.44:/var/www/html
+      --exclude="*"
+      --include="server.js"
+      --include="http-server.js"
+      --include="package.json"
+      --include="package-lock.json"
+    # install packages necessary for backend
+    - npm install
+    - sudo -u nodejs pm2 start server.js -- --port=8080
   artifacts:
     paths:
      - node_modules/
