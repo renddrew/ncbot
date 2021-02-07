@@ -18,18 +18,24 @@ deploy:
   script:
     - apt-get update -y
     - apt-get -y install rsync
+    # install deps
+    - npm install
+    # build frontend
+    - npm run build
+    # update frontend files in server
+    - rsync -avz
+      --delete
+      $PWD/dist/ root@157.230.215.44:/var/www/html/
+    # update backend dir files
     - rsync -avz
       --delete
       --exclude db
       $PWD/backend root@157.230.215.44:/var/www/html/backend
+    # update backend entry files
     - rsync -avz
       $PWD/server.js root@157.230.215.44:/var/www/html
     - rsync -avz
       $PWD/http-server.js root@157.230.215.44:/var/www/html
-    - npm install
-    - npm run build
-    - rsync -avz
-      $PWD/dist/ root@157.230.215.44:/var/www/html/
   artifacts:
     paths:
      - node_modules/
