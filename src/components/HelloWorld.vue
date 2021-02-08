@@ -18,7 +18,7 @@
     <br> 
 
     On Order:
-    <strong>BTC:</strong> {{ balances.BTC && balances.BTC.onOrder ? parseFloat(balances.BTC.onOrder).toFixed(6) : ''}}
+    <strong>BTC::</strong> {{ balances.BTC && balances.BTC.onOrder ? parseFloat(balances.BTC.onOrder).toFixed(6) : ''}}
     <strong>USDT:</strong> ${{ balances.USDT && balances.USDT.onOrder ? parseFloat(balances.USDT.onOrder).toFixed(2) : ''}}
 
     <br>
