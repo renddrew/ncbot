@@ -16,9 +16,9 @@ before_script:
 deploy:
   stage: deploy
   script:
-    - apt-get update -y
-    - apt-get -y install rsync
-    # install deps
+    # - apt-get update -y
+    # - apt-get -y install rsync
+    # # install deps
     - npm install
     # build frontend
     - npm run build
@@ -39,11 +39,12 @@ deploy:
       --include="package-lock.json"
       --exclude="*"
       $PWD/ root@157.230.215.44:/var/www/html
-    # install packages necessary for backend
+    # install packages necessary for backend and restart server
     - ssh root@157.230.215.44 "
         cd ../var/www/html/ &&
         npm install &&
         pm2 restart server"
+
   artifacts:
     paths:
      - node_modules/
