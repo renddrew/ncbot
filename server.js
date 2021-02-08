@@ -12,6 +12,9 @@ const GetRanges = require('./backend/get-ranges');
 
 // https://www.npmjs.com/package/stormdb
 
+// lets encrypt tutorial
+// https://www.learnwithjason.dev/blog/deploy-nodejs-ssl-digitalocean
+
 
 // Create web socket server on top of a regular http server
 // IMPORTANT declare port elsewhere to avoid erris with port un use for both servers
