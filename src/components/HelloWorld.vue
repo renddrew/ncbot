@@ -192,15 +192,20 @@ export default {
     width:100%!important;
     margin: 0 auto;
     max-width:800px!important;
-  td{
-    padding: 6px 2px!important;
-    &.text-align-left {
-      span {
-        display: block;
-        text-align:left
+    td {
+      padding: 6px 2px!important;
+      &.text-align-left {
+        span {
+          display: block;
+          text-align:left
+        }
       }
     }
   }
-}
+  .tags {
+    .tag {
+      min-width:60px;
+    }
+  }
 
 </style>
