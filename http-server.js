@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const binanceRequests = require('./backend/binance-requests');
+const GetRanges = require('./backend/get-ranges');
 
 const app = express();
 app.use(cors());
@@ -15,6 +16,12 @@ app.post('/getTrades', async (req, res) => {
 app.post('/getBalances', async (req, res) => {
   const data = await binanceRequests.getBalances();
   res.send({balances:data});
+});
+
+app.post('/getRanges', async (req, res) => {
+  const ranges = new GetRanges();
+  const rangeVals = ranges.getPeriodHistory();
+  res.send({ rangeVals });
 });
 
 module.exports = app;

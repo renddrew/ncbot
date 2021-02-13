@@ -27,7 +27,12 @@
      <strong>BTC:</strong> {{ totalValues.btcTotal }}
      <strong>USDT:</strong> ${{ totalValues.usdtTotal }}
     <br>
-    <br>
+
+    <b-taglist class="is-centered" style="padding:10px">
+      <b-tag type="is-info">4 hr</b-tag>
+      <b-tag type="is-info">1.5 hr</b-tag>
+      <b-tag type="is-info">30min</b-tag>
+    </b-taglist>
 
     <b-table :data="trades" :mobileCards=false class="is-size-7-mobile">
       <b-table-column field="isBuyer" v-slot="props">

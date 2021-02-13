@@ -12,9 +12,6 @@ const GetRanges = require('./backend/get-ranges');
 
 // https://www.npmjs.com/package/stormdb
 
-// lets encrypt tutorial
-// https://www.learnwithjason.dev/blog/deploy-nodejs-ssl-digitalocean
-
 
 // Create web socket server on top of a regular http server
 // IMPORTANT declare port elsewhere to avoid erris with port un use for both servers
@@ -66,7 +63,7 @@ setInterval(() => {
   ph.addPriceHistory(lastPrice);
 }, 1000);
 
-// const ranges = new GetRanges();
-// const rangeVals = ranges.getPeriodHistory();
-// console.log(rangeVals);
+const ranges = new GetRanges();
+const rangeVals = ranges.getPeriodHistory();
+console.log(rangeVals);
 

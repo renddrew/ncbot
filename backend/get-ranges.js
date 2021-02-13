@@ -10,14 +10,33 @@ const GetRanges = class {
   
   constructor() {
     this.timeNow = parseInt((new Date()).getTime());
-    this.shortPeriod = this.timeNow - (60*60*1000);    // 1hr
-    this.mediumPeriod = this.timeNow - (60*60*1000*2); // 2hrs
-    this.longPeriod = this.timeNow - (60*60*1000*4);   // 4hrs
-    this.allPeriodHist = [];
-    this.shortPeriodHist = [];
-    this.mediumPeriodHist = [];
-    this.longPeriodHist = [];
+    this.shortPeriod = this.timeNow - (60*30*1000);    // 30mins
+    this.mediumPeriod = this.timeNow - (60*60*1000*1.5); // 1.5hrs
+    this.longPeriod = this.timeNow - (60*60*1000*3);   // 3hrs
+
+    // this.shortPeriod = this.timeNow - (60*10*1000);    // 10 min
+    // this.mediumPeriod = this.timeNow - (60*20*1000);   // 20 min
+    // this.longPeriod = this.timeNow - (60*60*1000*1);  // 1hr
+
     this.getPeriodHistory();
+  }
+
+  getPeriodStartEndAverages(periodHist) {
+    const setSize = parseInt(periodHist.length * 0.05); // 5 percent
+    let shortSetStartTotal = 0;
+    let shortSetEndTotal = 0;
+    for (let i = 0; i < periodHist.length; i++) {
+      if (i < setSize) {
+        shortSetStartTotal += periodHist[i].p;
+      }
+      if (i >= (periodHist.length - setSize)) {
+        shortSetEndTotal += periodHist[i].p;
+      }
+    }
+    return {
+      start: shortSetStartTotal / setSize,
+      end: shortSetEndTotal / setSize
+    };
   }
 
   getPeriodHistory() {
@@ -25,6 +44,11 @@ const GetRanges = class {
     const currentHour = parseInt(moment().format('H'));
     const dateFileDir = './backend/db/btcusdt';
     const histHours = 4;
+
+    this.allPeriodHist = [];
+    this.shortPeriodHist = [];
+    this.mediumPeriodHist = [];
+    this.longPeriodHist = [];
 
     this.allPeriodHist = [];
     for (let i = 0; i < histHours; i++) {
@@ -45,9 +69,13 @@ const GetRanges = class {
     data.mediumMinPrice = 9999999999;
     data.longMaxPrice = 0;
     data.longMinPrice = 99999999999;
+    data.shortAveragePrice = 0;
+    data.mediumAveragePrice = 0;
+    data.longAveragePrice = 0;
 
     for (let ti = 0; ti < this.allPeriodHist.length; ti++) {
       if (this.allPeriodHist[ti].t > this.shortPeriod) {
+        data.shortAveragePrice += this.allPeriodHist[ti].p;
         this.shortPeriodHist.push(this.allPeriodHist[ti]);
         if (data.shortMaxPrice < this.allPeriodHist[ti].p) {
           data.shortMaxPrice = this.allPeriodHist[ti].p;
@@ -57,6 +85,7 @@ const GetRanges = class {
         }
       }
       if (this.allPeriodHist[ti].t > this.mediumPeriod) {
+        data.mediumAveragePrice += this.allPeriodHist[ti].p;
         this.mediumPeriodHist.push(this.allPeriodHist[ti]);
         if (data.mediumMaxPrice < this.allPeriodHist[ti].p) {
           data.mediumMaxPrice = this.allPeriodHist[ti].p;
@@ -66,6 +95,7 @@ const GetRanges = class {
         }
       }
       if (this.allPeriodHist[ti].t > this.longPeriod) {
+        data.longAveragePrice += this.allPeriodHist[ti].p;
         this.longPeriodHist.push(this.allPeriodHist[ti]);
         if (data.longMaxPrice < this.allPeriodHist[ti].p) {
           data.longMaxPrice = this.allPeriodHist[ti].p;
@@ -76,9 +106,30 @@ const GetRanges = class {
       }
     }
 
+    const shortPeriodStartEnd = this.getPeriodStartEndAverages(this.shortPeriodHist);
+    const mediumPeriodStartEnd = this.getPeriodStartEndAverages(this.mediumPeriodHist);
+    const longPeriodStartEnd = this.getPeriodStartEndAverages(this.longPeriodHist);
+
+    data.shortSetStartAverage = shortPeriodStartEnd.start;
+    data.shortSetEndAverage = shortPeriodStartEnd.end;
+
+    data.mediumSetStartAverage = mediumPeriodStartEnd.start;
+    data.mediumSetEndAverage = mediumPeriodStartEnd.end;
+
+    data.longSetStartAverage = longPeriodStartEnd.start;
+    data.longSetEndAverage = longPeriodStartEnd.end;
+
+    // calculate period average prices
+    data.shortAveragePrice /= this.shortPeriodHist.length;
+    data.mediumAveragePrice /= this.mediumPeriodHist.length;
+    data.longAveragePrice /= this.longPeriodHist.length;
+
+    data.longUptrend = longPeriodStartEnd.start < longPeriodStartEnd.end; // short and medium trend averages are greater than long trend
+    data.mediumUptrend = mediumPeriodStartEnd.start < mediumPeriodStartEnd.end; // medium average is greater than long average
+    data.shortUptrend = shortPeriodStartEnd.start < shortPeriodStartEnd.end; // short average is greater than medium average
+
     return data;
   }
-
 }
 
 module.exports = GetRanges;
