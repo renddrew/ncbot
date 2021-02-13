@@ -21,8 +21,8 @@ const GetRanges = class {
     this.getPeriodHistory();
   }
 
-  getPeriodStartEndAverages(periodHist) {
-    const setSize = parseInt(periodHist.length * 0.05); // 5 percent
+  getPeriodStartEndAverages(periodHist, percentStartEnd) {
+    const setSize = parseInt(periodHist.length * percentStartEnd);
     let shortSetStartTotal = 0;
     let shortSetEndTotal = 0;
     for (let i = 0; i < periodHist.length; i++) {
@@ -60,7 +60,7 @@ const GetRanges = class {
       this.allPeriodHist = this.allPeriodHist.concat(vals);
     }
 
-    
+
     const data = {
       allPeriodHist: this.allPeriodHist.length,
     };
@@ -107,9 +107,9 @@ const GetRanges = class {
       }
     }
 
-    const shortPeriodStartEnd = this.getPeriodStartEndAverages(this.shortPeriodHist);
-    const mediumPeriodStartEnd = this.getPeriodStartEndAverages(this.mediumPeriodHist);
-    const longPeriodStartEnd = this.getPeriodStartEndAverages(this.longPeriodHist);
+    const shortPeriodStartEnd = this.getPeriodStartEndAverages(this.shortPeriodHist, 0.2); // 20 percent 
+    const mediumPeriodStartEnd = this.getPeriodStartEndAverages(this.mediumPeriodHist, 0.2);
+    const longPeriodStartEnd = this.getPeriodStartEndAverages(this.longPeriodHist, 0.2);
 
     data.shortSetStartAverage = shortPeriodStartEnd.start;
     data.shortSetEndAverage = shortPeriodStartEnd.end;
