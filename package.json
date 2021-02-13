@@ -8,7 +8,8 @@
     "build": "vue-cli-service build --no-clean",
     "lint": "vue-cli-service lint",
     "backend": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "syncLocalDb": "rsync -avz root@157.230.215.44:/var/www/html/backend/db/ ~/documents/web/nodecbot/backend/db"
   },
   "dependencies": {
     "buefy": "^0.9.4",
