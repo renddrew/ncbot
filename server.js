@@ -31,7 +31,7 @@ const binance = new Binance().options({
 //   console.info("bookTickers", ticker);
 // });
 
-let lastPrice = '22';
+let lastPrice = 999999999;
 binance.websockets.chart('BTCUSDT', '1m', (symbol, interval, chart) => {
   const tick = binance.last(chart);
   const last = chart[tick].close;

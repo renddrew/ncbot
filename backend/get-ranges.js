@@ -63,7 +63,7 @@ const GetRanges = class {
     const data = {
       allPeriodHist: this.allPeriodHist.length,
     };
-    
+
     data.shortMaxPrice = 0;
     data.shortMinPrice = 999999999;
     data.mediumMaxPrice = 0;
@@ -134,3 +134,5 @@ const GetRanges = class {
 }
 
 module.exports = GetRanges;
+
+
