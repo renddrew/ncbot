@@ -13,11 +13,6 @@ const GetRanges = class {
     this.shortPeriod = this.timeNow - (60*30*1000);    // 30mins
     this.mediumPeriod = this.timeNow - (60*60*1000*1.5); // 1.5hrs
     this.longPeriod = this.timeNow - (60*60*1000*3);   // 3hrs
-
-    // this.shortPeriod = this.timeNow - (60*10*1000);    // 10 min
-    // this.mediumPeriod = this.timeNow - (60*20*1000);   // 20 min
-    // this.longPeriod = this.timeNow - (60*60*1000*1);  // 1hr
-
     this.getPeriodHistory();
   }
 
@@ -113,8 +108,8 @@ const GetRanges = class {
     }
 
     const shortPeriodStartEnd = this.getPeriodStartEndAverages(this.shortPeriodHist, 0.2); // 20 percent
-    const mediumPeriodStartEnd = this.getPeriodStartEndAverages(this.mediumPeriodHist, 0.1);
-    const longPeriodStartEnd = this.getPeriodStartEndAverages(this.longPeriodHist, 0.05);
+    const mediumPeriodStartEnd = this.getPeriodStartEndAverages(this.mediumPeriodHist, 0.2);
+    const longPeriodStartEnd = this.getPeriodStartEndAverages(this.longPeriodHist, 0.2);
 
     data.shortSetStartAverage = shortPeriodStartEnd.start;
     data.shortSetEndAverage = shortPeriodStartEnd.end;
