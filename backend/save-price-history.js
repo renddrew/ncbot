@@ -32,6 +32,7 @@ const SavePriceHistory = class {
   addPriceHistory(lastPrice) {
     this.priceHistDb.default({ history: [] });
     const time = (new Date()).getTime();
+    if (!lastPrice) return;
     this.priceHistDb.get('history').push({ t: time, p: lastPrice });
     this.priceHistDb.save(); // async
   }

@@ -75,6 +75,9 @@ const GetRanges = class {
     data.longAveragePrice = 0;
 
     for (let ti = 0; ti < this.allPeriodHist.length; ti++) {
+      
+      if (!this.allPeriodHist[ti].p || this.allPeriodHist[ti].p === 999999999) continue;
+
       if (this.allPeriodHist[ti].t > this.shortPeriod) {
         data.shortAveragePrice += this.allPeriodHist[ti].p;
         this.shortPeriodHist.push(this.allPeriodHist[ti]);
