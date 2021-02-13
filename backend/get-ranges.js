@@ -60,6 +60,7 @@ const GetRanges = class {
       this.allPeriodHist = this.allPeriodHist.concat(vals);
     }
 
+    
     const data = {
       allPeriodHist: this.allPeriodHist.length,
     };

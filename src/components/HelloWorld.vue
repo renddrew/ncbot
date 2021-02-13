@@ -29,9 +29,9 @@
     <br>
 
     <b-taglist class="is-centered" style="padding:10px">
-      <b-tag type="is-info">4 hr</b-tag>
-      <b-tag type="is-info">1.5 hr</b-tag>
-      <b-tag type="is-info">30min</b-tag>
+      <b-tag :type="ranges.shortUptrend ? 'is-success' : 'is-danger'">4 hr</b-tag>
+      <b-tag :type="ranges.mediumUptrend ? 'is-success' : 'is-danger'">1.5 hr</b-tag>
+      <b-tag :type="ranges.longUptrend ? 'is-success' : 'is-danger'">30 min</b-tag>
     </b-taglist>
 
     <b-table :data="trades" :mobileCards=false class="is-size-7-mobile">
@@ -83,6 +83,7 @@ export default {
       msg: null,
       trades: [],
       balances: [],
+      ranges: {}
     }
   },
 
@@ -130,6 +131,17 @@ export default {
       this.balances = balances;
     },
 
+    async getRanges() {
+      const rangeRes = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/getRanges`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      })).json();
+      this.$buefy.snackbar.open({message:'got ranges', duration: 500});
+      this.ranges = rangeRes.rangeVals;
+    },
+
     niceTime(ts) {
       return moment.unix(ts/1000).format('MMM Do YYYY h:mm a')
     },
@@ -137,12 +149,14 @@ export default {
     reload() {
       this.getTrades();
       this.getBalances();
+      this.getRanges();
     }
   },
 
   mounted() {
     this.getTrades();
     this.getBalances();
+    this.getRanges();
 
      new TradingView.widget({
       "width": '100%',
