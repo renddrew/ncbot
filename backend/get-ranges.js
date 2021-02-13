@@ -23,19 +23,19 @@ const GetRanges = class {
 
   getPeriodStartEndAverages(periodHist, percentStartEnd) {
     const setSize = parseInt(periodHist.length * percentStartEnd);
-    let shortSetStartTotal = 0;
-    let shortSetEndTotal = 0;
+    let startTotal = 0;
+    let endTotal = 0;
     for (let i = 0; i < periodHist.length; i++) {
       if (i < setSize) {
-        shortSetStartTotal += periodHist[i].p;
+        startTotal += periodHist[i].p;
       }
       if (i >= (periodHist.length - setSize)) {
-        shortSetEndTotal += periodHist[i].p;
+        endTotal += periodHist[i].p;
       }
     }
     return {
-      start: shortSetStartTotal / setSize,
-      end: shortSetEndTotal / setSize
+      start: startTotal / setSize,
+      end: endTotal / setSize
     };
   }
 
@@ -57,9 +57,14 @@ const GetRanges = class {
       let engine = new StormDB.localFileEngine(db);
       let vals = (new StormDB(engine)).get('history').value();
       if (!vals || !vals.length) continue;
+
+      // ensure oldest last
+      vals = vals.sort((a, b) => {
+        return a.t - b.t;
+      });
+
       this.allPeriodHist = this.allPeriodHist.concat(vals);
     }
-
 
     const data = {
       allPeriodHist: this.allPeriodHist.length,
@@ -107,9 +112,9 @@ const GetRanges = class {
       }
     }
 
-    const shortPeriodStartEnd = this.getPeriodStartEndAverages(this.shortPeriodHist, 0.2); // 20 percent 
-    const mediumPeriodStartEnd = this.getPeriodStartEndAverages(this.mediumPeriodHist, 0.2);
-    const longPeriodStartEnd = this.getPeriodStartEndAverages(this.longPeriodHist, 0.2);
+    const shortPeriodStartEnd = this.getPeriodStartEndAverages(this.shortPeriodHist, 0.2); // 20 percent
+    const mediumPeriodStartEnd = this.getPeriodStartEndAverages(this.mediumPeriodHist, 0.1);
+    const longPeriodStartEnd = this.getPeriodStartEndAverages(this.longPeriodHist, 0.05);
 
     data.shortSetStartAverage = shortPeriodStartEnd.start;
     data.shortSetEndAverage = shortPeriodStartEnd.end;
