@@ -29,9 +29,9 @@
     <br>
 
     <b-taglist class="is-centered" style="padding:10px">
-      <b-tag :type="ranges.shortUptrend ? 'is-success' : 'is-danger'">4 hr</b-tag>
+      <b-tag :type="ranges.longUptrend ? 'is-success' : 'is-danger'">4 hr</b-tag>
       <b-tag :type="ranges.mediumUptrend ? 'is-success' : 'is-danger'">1.5 hr</b-tag>
-      <b-tag :type="ranges.longUptrend ? 'is-success' : 'is-danger'">30 min</b-tag>
+      <b-tag :type="ranges.shortUptrend ? 'is-success' : 'is-danger'">30 min</b-tag>
     </b-taglist>
 
     <b-table :data="trades" :mobileCards=false class="is-size-7-mobile">

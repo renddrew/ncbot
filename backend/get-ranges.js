@@ -75,8 +75,18 @@ const GetRanges = class {
     data.longAveragePrice = 0;
 
     for (let ti = 0; ti < this.allPeriodHist.length; ti++) {
-
+      // temp for bad values from poor defaults, will keep first condition
       if (!this.allPeriodHist[ti].p || this.allPeriodHist[ti].p === 999999999 || this.allPeriodHist[ti].p === '22') continue;
+
+      let ma20 = 0;
+      if (ti > 20) {
+        for (let ma20i = 0; ma20i < 20; ma20i++) {
+          // add last 20 prices together
+          ma20 += parseInt(this.allPeriodHist[ti - ma20i].p);
+        }
+        ma20 /= 20;
+        this.allPeriodHist[ti].ma20 = ma20;
+      }
 
       if (this.allPeriodHist[ti].t > this.shortPeriod) {
         data.shortAveragePrice += this.allPeriodHist[ti].p;
@@ -128,9 +138,11 @@ const GetRanges = class {
     data.mediumAveragePrice /= this.mediumPeriodHist.length;
     data.longAveragePrice /= this.longPeriodHist.length;
 
-    data.longUptrend = longPeriodStartEnd.start < longPeriodStartEnd.end; // short and medium trend averages are greater than long trend
-    data.mediumUptrend = mediumPeriodStartEnd.start < mediumPeriodStartEnd.end; // medium average is greater than long average
-    data.shortUptrend = shortPeriodStartEnd.start < shortPeriodStartEnd.end; // short average is greater than medium average
+    data.longUptrend = longPeriodStartEnd.start < longPeriodStartEnd.end;        // short and medium trend averages are greater than long trend
+    data.mediumUptrend = mediumPeriodStartEnd.start < mediumPeriodStartEnd.end;  // medium average is greater than long average
+    data.shortUptrend = shortPeriodStartEnd.start < shortPeriodStartEnd.end;     // short average is greater than medium average
+
+    data.sample = this.allPeriodHist.slice(20);
 
     return data;
   }
