@@ -52,18 +52,18 @@ const GetRanges = class {
       let engine = new StormDB.localFileEngine(db);
       let vals = (new StormDB(engine)).get('history').value();
       if (!vals || !vals.length) continue;
-
-      // ensure oldest last
-      vals = vals.sort((a, b) => {
-        return a.t - b.t;
-      });
-
       this.allPeriodHist = this.allPeriodHist.concat(vals);
     }
+
+    // ensure oldest last
+    this.allPeriodHist = this.allPeriodHist.sort((a, b) => {
+      return a.t - b.t;
+    });
 
     const data = {
       allPeriodHist: this.allPeriodHist.length,
     };
+    
     data.shortMaxPrice = 0;
     data.shortMinPrice = 999999999;
     data.mediumMaxPrice = 0;
