@@ -60,20 +60,24 @@ const GetRanges = class {
       // temp for bad values from poor defaults, will keep first condition
       if (!this.allPeriodHist[ti].p || this.allPeriodHist[ti].p === 999999999 || this.allPeriodHist[ti].p === '22') continue;
 
+
+      // problem becuase this calculates MA for every second, need to divide time or mulitply ma size eg for  MA20 do 20*60 assuming there are 60 hist items per min
+
+      let maSize = 20 * 60; // assume 60 entries in second
       let ma20 = 0;
       const maList = [];
-      if (ti > 20) {
-        for (let ma20i = 0; ma20i < 20; ma20i++) {
+      if (ti > maSize) {
+        for (let ma20i = 0; ma20i < maSize; ma20i++) {
           // add last 20 prices together
           const val = parseInt(this.allPeriodHist[ti - ma20i].p);
           ma20+=val;
           maList.push(val);
         }
-        ma20 /= 20;
+        ma20 /= maSize;
         this.allPeriodHist[ti].ma20 = ma20;
 
         // add bollinger band
-        if (ti > 40) {
+        if (ti > maSize*2) {
           const stdDev = utils.calcStdDeviation(maList);
           this.allPeriodHist[ti].stdDev = stdDev;
           this.allPeriodHist[ti].bbUpper = ma20 + (2 * stdDev);
@@ -142,5 +146,6 @@ const GetRanges = class {
 }
 
 module.exports = GetRanges;
+
 
 
