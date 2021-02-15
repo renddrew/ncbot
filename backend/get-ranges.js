@@ -16,24 +16,6 @@ const GetRanges = class {
     this.getPeriodHistory();
   }
 
-  getPeriodStartEndAverages(periodHist, percentStartEnd) {
-    const setSize = parseInt(periodHist.length * percentStartEnd);
-    let startTotal = 0;
-    let endTotal = 0;
-    for (let i = 0; i < periodHist.length; i++) {
-      if (i < setSize) {
-        startTotal += periodHist[i].p;
-      }
-      if (i >= (periodHist.length - setSize)) {
-        endTotal += periodHist[i].p;
-      }
-    }
-    return {
-      start: startTotal / setSize,
-      end: endTotal / setSize
-    };
-  }
-
   getPeriodHistory() {
     const dateFile = moment().format('YYYY-MM-DD');
     const currentHour = parseInt(moment().format('H'));
@@ -79,15 +61,26 @@ const GetRanges = class {
       if (!this.allPeriodHist[ti].p || this.allPeriodHist[ti].p === 999999999 || this.allPeriodHist[ti].p === '22') continue;
 
       let ma20 = 0;
+      const maList = [];
       if (ti > 20) {
         for (let ma20i = 0; ma20i < 20; ma20i++) {
           // add last 20 prices together
-          ma20 += parseInt(this.allPeriodHist[ti - ma20i].p);
+          const val = parseInt(this.allPeriodHist[ti - ma20i].p);
+          ma20+=val;
+          maList.push(val);
         }
         ma20 /= 20;
         this.allPeriodHist[ti].ma20 = ma20;
-      }
 
+        // add bollinger band
+        if (ti > 40) {
+          const stdDev = utils.calcStdDeviation(maList);
+          this.allPeriodHist[ti].stdDev = stdDev;
+          this.allPeriodHist[ti].bbUpper = ma20 + (2 * stdDev);
+          this.allPeriodHist[ti].bbLower = ma20 - (2 * stdDev);
+        }
+      }
+ 
       if (this.allPeriodHist[ti].t > this.shortPeriod) {
         data.shortAveragePrice += this.allPeriodHist[ti].p;
         this.shortPeriodHist.push(this.allPeriodHist[ti]);
@@ -120,9 +113,9 @@ const GetRanges = class {
       }
     }
 
-    const shortPeriodStartEnd = this.getPeriodStartEndAverages(this.shortPeriodHist, 0.2); // 20 percent
-    const mediumPeriodStartEnd = this.getPeriodStartEndAverages(this.mediumPeriodHist, 0.2);
-    const longPeriodStartEnd = this.getPeriodStartEndAverages(this.longPeriodHist, 0.2);
+    const shortPeriodStartEnd = utils.getPeriodStartEndAverages(this.shortPeriodHist, 0.2); // 20 percent
+    const mediumPeriodStartEnd = utils.getPeriodStartEndAverages(this.mediumPeriodHist, 0.2);
+    const longPeriodStartEnd = utils.getPeriodStartEndAverages(this.longPeriodHist, 0.2);
 
     data.shortSetStartAverage = shortPeriodStartEnd.start;
     data.shortSetEndAverage = shortPeriodStartEnd.end;

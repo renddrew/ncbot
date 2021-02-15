@@ -65,5 +65,7 @@ setInterval(() => {
 
 const ranges = new GetRanges();
 const rangeVals = ranges.getPeriodHistory();
-console.log(rangeVals);
+
+const rangeValsTrim = rangeVals.sample.slice(-20);
+console.log(rangeValsTrim);
 
