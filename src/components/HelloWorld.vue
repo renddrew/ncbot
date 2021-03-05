@@ -162,7 +162,7 @@ export default {
       "width": '100%',
       "autosize": false,
       "symbol": "BINANCE:BTCUSDT",
-      "interval": "1",
+      "interval": "5",
       "timezone": "America/Toronto",
       "theme": "dark",
       "style": "1",

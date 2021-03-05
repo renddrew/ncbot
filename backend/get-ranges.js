@@ -63,6 +63,12 @@ const GetRanges = class {
 
       // problem becuase this calculates MA for every second, need to divide time or mulitply ma size eg for  MA20 do 20*60 assuming there are 60 hist items per min
 
+      // solution A: keep track of timestamp and do not record another in maSize until x timeframe has passed eg. 1 min, 5min time frames
+
+      // https://www.fidelity.com/learning-center/trading-investing/technical-analysis/technical-indicator-guide/bollinger-bands
+
+      // https://www.investopedia.com/terms/s/standarddeviation.asp
+
       let maSize = 20 * 60; // assume 60 entries in second
       let ma20 = 0;
       const maList = [];
