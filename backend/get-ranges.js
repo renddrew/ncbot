@@ -69,6 +69,8 @@ const GetRanges = class {
 
       // https://www.investopedia.com/terms/s/standarddeviation.asp
 
+      
+
       let maSize = 20 * 60; // assume 60 entries in second
       let ma20 = 0;
       const maList = [];
@@ -81,7 +83,7 @@ const GetRanges = class {
         }
         ma20 /= maSize;
         this.allPeriodHist[ti].ma20 = ma20;
-
+        
         // add bollinger band
         if (ti > maSize*2) {
           const stdDev = utils.calcStdDeviation(maList);
@@ -145,10 +147,50 @@ const GetRanges = class {
     data.mediumUptrend = mediumPeriodStartEnd.start < mediumPeriodStartEnd.end;  // medium average is greater than long average
     data.shortUptrend = shortPeriodStartEnd.start < shortPeriodStartEnd.end;     // short average is greater than medium average
 
-    data.sample = this.allPeriodHist.slice(20);
-
     return data;
   }
+
+  getLastBB() {
+
+    // make sure newest first
+    const itms = this.allPeriodHist.sort((a, b) => {
+      return b.t - a.t;
+    });
+  /*
+      record ma for different time frames
+      - before using next item, make sure it's time is X seconds past last used item's time
+
+    */
+
+    let last1Min = 0
+    let last5min = 0
+    let last15min = 0
+
+    // loop last items first
+    let timeFrames5min = [];
+    let last5minTime = 0;
+
+    for (let i = 0; i < itms.length; i++) {
+      if (!itms[i]) continue;
+      const timeNow = parseInt(itms[i].t);
+      if (!last5minTime || timeNow < (last5minTime - (1000*60*5))) {
+        last5minTime = timeNow;
+        timeFrames5min.push(timeNow);
+      }
+      if (timeFrames5min.length >= 20) break;
+    }
+
+    console.log(timeFrames5min)
+
+
+
+
+
+  }
+
+
+
+
 }
 
 module.exports = GetRanges;
