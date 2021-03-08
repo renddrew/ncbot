@@ -1,6 +1,6 @@
 const StormDB = require('stormdb');
 const cron = require('node-cron');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const fs = require('fs');
 const utils = require('./utils');
 
@@ -19,7 +19,7 @@ const SavePriceHistory = class {
   }
 
   setDateFile() {
-    const dateFile = moment().format('YYYY-MM-DD-H');
+    const dateFile = moment().tz('America/Toronto').format('YYYY-MM-DD-H');
     const dirpath = './backend/db/btcusdt';
     fs.mkdirSync(dirpath, { recursive: true });
     const dateFileStr = `${dirpath}/${dateFile}.stormdb`;

@@ -1,6 +1,6 @@
 const StormDB = require('stormdb');
 const cron = require('node-cron');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const fs = require('fs');
 const utils = require('./utils');
 
@@ -17,8 +17,8 @@ const GetRanges = class {
   }
 
   getPeriodHistory() {
-    const dateFile = moment().format('YYYY-MM-DD');
-    const currentHour = parseInt(moment().format('H'));
+    const dateFile = moment().tz('America/Toronto').format('YYYY-MM-DD');
+    const currentHour = parseInt(moment().tz('America/Toronto').format('H'));
     const dateFileDir = './backend/db/btcusdt';
     const histHours = 4;
 
@@ -162,26 +162,35 @@ const GetRanges = class {
 
     */
 
-    let last1Min = 0
-    let last5min = 0
-    let last15min = 0
+    let last1Min = 0;
+    let last5min = 0;
+    let last15min = 0;
 
     // loop last items first
     let timeFrames5min = [];
+    let ma5min = 0;
     let last5minTime = 0;
 
+    // assemble arrays of ma values for each time period
     for (let i = 0; i < itms.length; i++) {
       if (!itms[i]) continue;
       const timeNow = parseInt(itms[i].t);
       if (!last5minTime || timeNow < (last5minTime - (1000*60*5))) {
         last5minTime = timeNow;
-        timeFrames5min.push(timeNow);
+        timeFrames5min.push(itms[i]);
+        ma5min += parseInt(itms[i].p);
       }
       if (timeFrames5min.length >= 20) break;
     }
+    ma5min /= 20;
 
-    console.log(timeFrames5min)
+    console.log(ma5min);
+    console.log(timeFrames5min);
 
+
+
+
+    
 
 
 
