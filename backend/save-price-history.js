@@ -4,6 +4,8 @@ const moment = require('moment-timezone');
 const fs = require('fs');
 const utils = require('./utils');
 
+moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
+
 // https://www.npmjs.com/package/stormdb
 
 const SavePriceHistory = class {
@@ -19,7 +21,7 @@ const SavePriceHistory = class {
   }
 
   setDateFile() {
-    const dateFile = moment().tz('America/Toronto').format('YYYY-MM-DD-H');
+    const dateFile = moment().format('YYYY-MM-DD-H');
     const dirpath = './backend/db/btcusdt';
     fs.mkdirSync(dirpath, { recursive: true });
     const dateFileStr = `${dirpath}/${dateFile}.stormdb`;

@@ -4,6 +4,8 @@ const moment = require('moment-timezone');
 const fs = require('fs');
 const utils = require('./utils');
 
+moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
+
 // https://www.npmjs.com/package/stormdb
 
 const GetRanges = class {
@@ -17,8 +19,8 @@ const GetRanges = class {
   }
 
   getPeriodHistory() {
-    const dateFile = moment().tz('America/Toronto').format('YYYY-MM-DD');
-    const currentHour = parseInt(moment().tz('America/Toronto').format('H'));
+    const dateFile = moment().format('YYYY-MM-DD');
+    const currentHour = parseInt(moment().format('H'));
     const dateFileDir = './backend/db/btcusdt';
     const histHours = 4;
 
@@ -170,32 +172,44 @@ const GetRanges = class {
     let timeFrames5min = [];
     let ma5min = 0;
     let last5minTime = 0;
+    const maLength = 20;
+    let count = 0;
 
     // assemble arrays of ma values for each time period
+    // unsolved problem with this is that if there are missing entries the MA will get thrown off
     for (let i = 0; i < itms.length; i++) {
       if (!itms[i]) continue;
       const timeNow = parseInt(itms[i].t);
-      if (!last5minTime || timeNow < (last5minTime - (1000*60*5))) {
+      const nextCaptureTime = last5minTime - (1000*60*5);
+      if (!last5minTime || (timeNow < nextCaptureTime)) {
+
+        const missed5minEntries = parseInt(((1000*60*5)) / (timeNow - nextCaptureTime));
+        count -= missed5minEntries;
+        console.log(missed5minEntries);
+
         last5minTime = timeNow;
         timeFrames5min.push(itms[i]);
         ma5min += parseInt(itms[i].p);
       }
-      if (timeFrames5min.length >= 20) break;
+      if (count >= maLength) break;
     }
-    ma5min /= 20;
+    ma5min /= timeFrames5min.length;
+
+    const ls = timeFrames5min.sort((a, b) => {
+      return b.t - a.t;
+    });
 
     console.log(ma5min);
-    console.log(timeFrames5min);
+    console.log(timeFrames5min.length)
+    console.log(ls);
 
 
 
 
     
-
-
-
-
   }
+
+
 
 
 
