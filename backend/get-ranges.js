@@ -184,7 +184,7 @@ const GetRanges = class {
 
       if (!last5minTime || (timeNow < nextCaptureTime)) {
 
-        const missed5minEntries = parseInt((last5minTime - timeNow) / ((1000*60*5) + (1000*10)));
+        const missed5minEntries = parseInt((last5minTime - timeNow) / ((1000*60*5) + (1000*2)));
         if (missed5minEntries >= 1) {
           count += missed5minEntries;
         }
@@ -205,28 +205,16 @@ const GetRanges = class {
     
     ma5min /= timeFrames5min.length;
 
-    const ls = timeFrames5min.sort((a, b) => {
-      return b.t - a.t;
-    });
-
     console.log(ma5min);
     console.log(timeFrames5min.length)
-    console.log(ls);
-
-
-
-
-    
+    console.log(timeFrames5min)
+ 
   }
-
-
-
-
-
-
 }
 
 module.exports = GetRanges;
+
+
 
 
 
