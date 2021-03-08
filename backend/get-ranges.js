@@ -154,31 +154,49 @@ const GetRanges = class {
 
   getLastBB(retrieveTime) {
 
-    // make sure newest first
-    const itms = this.allPeriodHist.sort((a, b) => {
-      return b.t - a.t;
-    });
-
     // prepare arrays of last time frames
     const maSize = 20;
     const times1min = [];
     const times5min = [];
     const times15min = [];
-    
+
     const start5minTime = parseInt(moment().format('mm')) - (parseInt(moment().format('mm')) % 5);
     const start5minEpoch = moment().minute(start5minTime).format('x');
     const start15minTime = parseInt(moment().format('mm')) - (parseInt(moment().format('mm')) % 15);
     const start15minEpoch = moment().minute(start15minTime).format('x');
-    
+
     for (let i = 0; i < maSize; i++) {
-      const time1min = moment().subtract(i, 'minute').format('x');
-      const time5min = moment(start5minEpoch - (i*(1000*60*5))).format('x');
-      const time15min = moment(start15minEpoch - (i*(1000*60*15))).format('x');
+      const time1min = parseInt(moment().subtract(i, 'minute').format('x'));
+      const time5min = parseInt(moment(start5minEpoch - (i*(1000*60*5))).format('x'));
+      const time15min = parseInt(moment(start15minEpoch - (i*(1000*60*15))).format('x'));
       times1min.push(time1min);
       times5min.push(time5min);
       times15min.push(time15min);
     }
+
+    const itms5min = [];
+    for (let i = 0; i < times5min.length; i++) {
+      const p = this.allPeriodHist.find(itm => {
+        const minTime = itm.t - (1000*2);
+        const maxTime = itm.t + (1000*2);
+        return times5min[i] >= minTime && times5min[i] <= maxTime;
+      });
+      if (p) {
+        p.nt = moment(p.t).format('llll');
+        itms5min.push(p);
+      }
+    }
+
+    console.log(itms5min)
+
+
+
+    
   }
+
+
+
+
 }
 
 module.exports = GetRanges;
