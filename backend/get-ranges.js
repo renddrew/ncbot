@@ -152,63 +152,32 @@ const GetRanges = class {
     return data;
   }
 
-  getLastBB() {
+  getLastBB(retrieveTime) {
 
     // make sure newest first
     const itms = this.allPeriodHist.sort((a, b) => {
       return b.t - a.t;
     });
-  /*
-      record ma for different time frames
-      - before using next item, make sure it's time is X seconds past last used item's time
 
-    */
-
-    let last1Min = 0;
-    let last5min = 0;
-    let last15min = 0;
-
-    // loop last items first
-    let timeFrames5min = [];
-    let ma5min = 0;
-    let last5minTime = 0;
-    const maLength = 20;
-    let count = 0;
-
-    // assemble arrays of ma values for each time period
-    // unsolved problem with this is that if there are missing entries the MA will get thrown off
-    for (let i = 0; i < itms.length; i++) {
-      if (!itms[i]) continue;
-      const timeNow = parseInt(itms[i].t);
-      const nextCaptureTime = last5minTime - (1000*60*5);
-
-      if (!last5minTime || (timeNow < nextCaptureTime)) {
-
-        const missed5minEntries = parseInt((last5minTime - timeNow) / ((1000*60*5) + (1000*2)));
-        if (missed5minEntries >= 1) {
-          count += missed5minEntries;
-        }
-
-        count++;
-
-        last5minTime = timeNow;
-
-        itms[i].nt = moment(itms[i].t).format('llll');
-        timeFrames5min.push(itms[i]);
-        ma5min += parseInt(itms[i].p);
-
-        timeFrames5min[i]
-
-      }
-      if (count >= maLength) break;
-    }
+    // prepare arrays of last time frames
+    const maSize = 20;
+    const times1min = [];
+    const times5min = [];
+    const times15min = [];
     
-    ma5min /= timeFrames5min.length;
-
-    console.log(ma5min);
-    console.log(timeFrames5min.length)
-    console.log(timeFrames5min)
- 
+    const start5minTime = parseInt(moment().format('mm')) - (parseInt(moment().format('mm')) % 5);
+    const start5minEpoch = moment().minute(start5minTime).format('x');
+    const start15minTime = parseInt(moment().format('mm')) - (parseInt(moment().format('mm')) % 15);
+    const start15minEpoch = moment().minute(start15minTime).format('x');
+    
+    for (let i = 0; i < maSize; i++) {
+      const time1min = moment().subtract(i, 'minute').format('x');
+      const time5min = moment(start5minEpoch - (i*(1000*60*5))).format('x');
+      const time15min = moment(start15minEpoch - (i*(1000*60*15))).format('x');
+      times1min.push(time1min);
+      times5min.push(time5min);
+      times15min.push(time15min);
+    }
   }
 }
 
