@@ -160,13 +160,13 @@ const GetRanges = class {
     const times5min = [];
     const times15min = [];
 
-    const start5minTime = parseInt(moment().format('mm')) - (parseInt(moment().format('mm')) % 5);
-    const start5minEpoch = moment().minute(start5minTime).format('x');
-    const start15minTime = parseInt(moment().format('mm')) - (parseInt(moment().format('mm')) % 15);
-    const start15minEpoch = moment().minute(start15minTime).format('x');
+    const start5minTime = parseInt(moment(retrieveTime).format('mm')) - (parseInt(moment(retrieveTime).format('mm')) % 5);
+    const start5minEpoch = moment(retrieveTime).minute(start5minTime).format('x');
+    const start15minTime = parseInt(moment(retrieveTime).format('mm')) - (parseInt(moment(retrieveTime).format('mm')) % 15);
+    const start15minEpoch = moment(retrieveTime).minute(start15minTime).format('x');
 
     for (let i = 0; i < maSize; i++) {
-      const time1min = parseInt(moment().subtract(i, 'minute').format('x'));
+      const time1min = parseInt(moment(retrieveTime).subtract(i, 'minute').format('x'));
       const time5min = parseInt(moment(start5minEpoch - (i*(1000*60*5))).format('x'));
       const time15min = parseInt(moment(start15minEpoch - (i*(1000*60*15))).format('x'));
       times1min.push(time1min);
@@ -174,26 +174,45 @@ const GetRanges = class {
       times15min.push(time15min);
     }
 
-    const itms5min = [];
-    for (let i = 0; i < times5min.length; i++) {
+    const min1 = this.calcMaBB(times1min);
+    const min5 = this.calcMaBB(times5min);
+    const min15 = this.calcMaBB(times15min);
+
+
+    console.log(min1)
+    console.log(min5)
+    console.log(min15)
+
+  }
+
+  
+  calcMaBB(timeList) {
+    // timeList is list of times
+    const itms = [];
+    const maitms = [];
+    let priceTotal = 0;
+    for (let i = 0; i < timeList.length; i++) {
       const p = this.allPeriodHist.find(itm => {
-        const minTime = itm.t - (1000*2);
-        const maxTime = itm.t + (1000*2);
-        return times5min[i] >= minTime && times5min[i] <= maxTime;
+        const minTime = itm.t - (1000*3);
+        const maxTime = itm.t + (1000*3);
+        return timeList[i] >= minTime && timeList[i] <= maxTime;
       });
-      if (p) {
+      if (p && p.p) {
         p.nt = moment(p.t).format('llll');
-        itms5min.push(p);
+        itms.push(p);
+        priceTotal += parseInt(p.p);
+        maitms.push(p.p);
       }
     }
 
-    console.log(itms5min)
-
-
-
-    
+    const ma = priceTotal / itms.length;
+    const stdDev = utils.calcStdDeviation(maitms);
+    return {
+      ma,
+      bbUpper: ma + (2 * stdDev),
+      bbLower: ma - (2 * stdDev),
+    };
   }
-
 
 
 
