@@ -63,7 +63,9 @@ setInterval(() => {
   ph.addPriceHistory(lastPrice);
 }, 1000);
 
-// const ranges = new GetRanges();
-// const bbvals = ranges.getLastBB();
+const ranges = new GetRanges();
+const bbvals = ranges.getLastBB();
+
+
 
 

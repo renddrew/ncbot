@@ -181,18 +181,28 @@ const GetRanges = class {
       if (!itms[i]) continue;
       const timeNow = parseInt(itms[i].t);
       const nextCaptureTime = last5minTime - (1000*60*5);
+
       if (!last5minTime || (timeNow < nextCaptureTime)) {
 
-        const missed5minEntries = parseInt(((1000*60*5)) / (timeNow - nextCaptureTime));
-        count -= missed5minEntries;
-        console.log(missed5minEntries);
+        const missed5minEntries = parseInt((last5minTime - timeNow) / ((1000*60*5) + (1000*10)));
+        if (missed5minEntries >= 1) {
+          count += missed5minEntries;
+        }
+
+        count++;
 
         last5minTime = timeNow;
+
+        itms[i].nt = moment(itms[i].t).format('llll');
         timeFrames5min.push(itms[i]);
         ma5min += parseInt(itms[i].p);
+
+        timeFrames5min[i]
+
       }
       if (count >= maLength) break;
     }
+    
     ma5min /= timeFrames5min.length;
 
     const ls = timeFrames5min.sort((a, b) => {
