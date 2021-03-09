@@ -5,6 +5,10 @@ const app = require('./http-server');
 const utils = require('./backend/utils');
 const SavePriceHistory = require('./backend/save-price-history');
 const GetRanges = require('./backend/get-ranges');
+const stratBBreEntry = require('./backend/stratBBreEntry');
+
+const moment = require('moment-timezone');
+moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 
 // https://stackoverflow.com/questions/34808925/express-and-websocket-listening-on-the-same-port/34838031
 
@@ -53,18 +57,24 @@ wss.on('connection', (ws) => {
   // });
 });
 
-server.listen(8080, () => {
-  console.log('http/ws server listening on 8080');
+server.listen(9090, () => {
+  console.log('http/ws server listening on 9090');
 });
+
+const st = new stratBBreEntry();
 
 // save price history
 const ph = new SavePriceHistory();
 setInterval(() => {
   ph.addPriceHistory(lastPrice);
+
+  const res = st.detectEntryMinute(lastPrice);
+  console.log(res)
+
 }, 1000);
 
-//const ranges = new GetRanges();
-//const bbvals = ranges.getLastBB();
+
+
 
 
 

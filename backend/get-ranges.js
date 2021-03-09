@@ -61,39 +61,6 @@ const GetRanges = class {
     for (let ti = 0; ti < this.allPeriodHist.length; ti++) {
       // temp for bad values from poor defaults, will keep first condition
       if (!this.allPeriodHist[ti].p || this.allPeriodHist[ti].p === 999999999 || this.allPeriodHist[ti].p === '22') continue;
-
-
-      // problem becuase this calculates MA for every second, need to divide time or mulitply ma size eg for  MA20 do 20*60 assuming there are 60 hist items per min
-
-      // solution A: keep track of timestamp and do not record another in maSize until x timeframe has passed eg. 1 min, 5min time frames
-
-      // https://www.fidelity.com/learning-center/trading-investing/technical-analysis/technical-indicator-guide/bollinger-bands
-
-      // https://www.investopedia.com/terms/s/standarddeviation.asp
-
-      
-
-      let maSize = 20 * 60; // assume 60 entries in second
-      let ma20 = 0;
-      const maList = [];
-      if (ti > maSize) {
-        for (let ma20i = 0; ma20i < maSize; ma20i++) {
-          // add last 20 prices together
-          const val = parseInt(this.allPeriodHist[ti - ma20i].p);
-          ma20+=val;
-          maList.push(val);
-        }
-        ma20 /= maSize;
-        this.allPeriodHist[ti].ma20 = ma20;
-        
-        // add bollinger band
-        if (ti > maSize*2) {
-          const stdDev = utils.calcStdDeviation(maList);
-          this.allPeriodHist[ti].stdDev = stdDev;
-          this.allPeriodHist[ti].bbUpper = ma20 + (2 * stdDev);
-          this.allPeriodHist[ti].bbLower = ma20 - (2 * stdDev);
-        }
-      }
  
       if (this.allPeriodHist[ti].t > this.shortPeriod) {
         data.shortAveragePrice += this.allPeriodHist[ti].p;
@@ -148,11 +115,10 @@ const GetRanges = class {
     data.longUptrend = longPeriodStartEnd.start < longPeriodStartEnd.end;        // short and medium trend averages are greater than long trend
     data.mediumUptrend = mediumPeriodStartEnd.start < mediumPeriodStartEnd.end;  // medium average is greater than long average
     data.shortUptrend = shortPeriodStartEnd.start < shortPeriodStartEnd.end;     // short average is greater than medium average
-
     return data;
   }
 
-  getLastBB(retrieveTime) {
+  getLastBB(retrieveTime, multiplier) {
 
     // prepare arrays of last time frames
     const maSize = 20;
@@ -174,20 +140,20 @@ const GetRanges = class {
       times15min.push(time15min);
     }
 
-    const min1 = this.calcMaBB(times1min);
-    const min5 = this.calcMaBB(times5min);
-    const min15 = this.calcMaBB(times15min);
+    const min1 = this.calcMaBB(times1min, multiplier);
+    const min5 = this.calcMaBB(times5min, multiplier);
+    const min15 = this.calcMaBB(times15min, multiplier);
 
-
-    console.log(min1)
-    console.log(min5)
-    console.log(min15)
-
+    return {
+      min1,
+      min5,
+      min15,
+    };
   }
 
-  
-  calcMaBB(timeList) {
+  calcMaBB(timeList, multiplier) {
     // timeList is list of times
+    multiplier = multiplier || 2;
     const itms = [];
     const maitms = [];
     let priceTotal = 0;
@@ -208,13 +174,17 @@ const GetRanges = class {
     const ma = priceTotal / itms.length;
     const stdDev = utils.calcStdDeviation(maitms);
     return {
+      time: moment(timeList[0]).tz('America/Toronto').format('llll'),
       ma,
-      bbUpper: ma + (2 * stdDev),
-      bbLower: ma - (2 * stdDev),
+      maLength: maitms.length,
+      bbUpper: ma + (multiplier * stdDev),
+      bbLower: ma - (multiplier * stdDev),
+      p: itms[0].p,
+      multiplier
     };
   }
 
-
+  // https://nullbeans.com/how-to-calculate-the-relative-strength-index-rsi/
 
 }
 
