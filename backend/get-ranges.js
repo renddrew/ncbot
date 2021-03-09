@@ -179,8 +179,8 @@ const GetRanges = class {
       maLength: maitms.length,
       bbUpper: ma + (multiplier * stdDev),
       bbLower: ma - (multiplier * stdDev),
-      p: itms[0].p,
-      multiplier
+      p: itms[0] ? itms[0].p : null,
+      multiplier,
     };
   }
 

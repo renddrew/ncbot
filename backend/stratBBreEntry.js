@@ -40,6 +40,8 @@ const stratBBreEntry = class {
     const out = {
       upperReEntry,
       lowerReEntry,
+      // current: currentVals.min1,
+      // last: lastVals.min1
     };
 
     if (upperReEntry || lowerReEntry) {
