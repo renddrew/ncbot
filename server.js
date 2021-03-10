@@ -59,8 +59,8 @@ wss.on('connection', (ws) => {
   // });
 });
 
-server.listen(9090, () => {
-  console.log('http/ws server listening on 9090');
+server.listen(8080, () => {
+  console.log('http/ws server listening on 8080');
 });
 
 // save price history once every server time second

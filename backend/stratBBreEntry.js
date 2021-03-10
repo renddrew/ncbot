@@ -22,7 +22,7 @@ const stratBBreEntry = class {
   detectEntryMinute() {
     const bbMuliplier = 1;
     const closeVals = this.ranges.getLastBB({}, bbMuliplier);
-    const prevCloseMin = moment().subtract(1, 'minute');
+    const prevCloseMin = moment().subtract(1, 'minute').startOf('minute');
     const prevCloseVals = this.ranges.getLastBB(prevCloseMin, bbMuliplier);
 
     const closeUpperBB = closeVals.min1.bbUpper;
