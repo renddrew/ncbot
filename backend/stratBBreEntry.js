@@ -12,7 +12,7 @@ moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 const stratBBreEntry = class {
 
   constructor() {
-    cron.schedule('*/5 * * * * *', () => {
+    cron.schedule('2 * * * * *', () => {
       const res = this.detectEntryMinute();
       console.log(res)
     });

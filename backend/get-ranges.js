@@ -37,12 +37,8 @@ const GetRanges = class {
       let engine = new StormDB.localFileEngine(db);
       let vals = (new StormDB(engine)).get('history').value();
       if (!vals || !vals.length) continue;
-      console.log(db);
-      console.log(vals.length)
       this.allPeriodHist = this.allPeriodHist.concat(vals);
     }
-
-    //console.log(this.allPeriodHist.length)
 
     // ensure oldest last
     this.allPeriodHist = this.allPeriodHist.sort((a, b) => {
