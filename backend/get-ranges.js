@@ -3,6 +3,7 @@ const cron = require('node-cron');
 const moment = require('moment-timezone');
 const fs = require('fs');
 const utils = require('./utils');
+const { _ } = require('core-js');
 
 moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 
@@ -36,8 +37,12 @@ const GetRanges = class {
       let engine = new StormDB.localFileEngine(db);
       let vals = (new StormDB(engine)).get('history').value();
       if (!vals || !vals.length) continue;
+      console.log(db);
+      console.log(vals.length)
       this.allPeriodHist = this.allPeriodHist.concat(vals);
     }
+
+    //console.log(this.allPeriodHist.length)
 
     // ensure oldest last
     this.allPeriodHist = this.allPeriodHist.sort((a, b) => {
@@ -61,7 +66,7 @@ const GetRanges = class {
     for (let ti = 0; ti < this.allPeriodHist.length; ti++) {
       // temp for bad values from poor defaults, will keep first condition
       if (!this.allPeriodHist[ti].p || this.allPeriodHist[ti].p === 999999999 || this.allPeriodHist[ti].p === '22') continue;
- 
+
       if (this.allPeriodHist[ti].t > this.shortPeriod) {
         data.shortAveragePrice += this.allPeriodHist[ti].p;
         this.shortPeriodHist.push(this.allPeriodHist[ti]);
@@ -159,8 +164,8 @@ const GetRanges = class {
     let priceTotal = 0;
     for (let i = 0; i < timeList.length; i++) {
       const p = this.allPeriodHist.find(itm => {
-        const minTime = itm.t - (1000*1.5);
-        const maxTime = itm.t + (1000*1.5);
+        const minTime = itm.t - (1000*1.8);
+        const maxTime = itm.t + (1000*1.8);
         return timeList[i] >= minTime && timeList[i] <= maxTime;
       });
       if (p && parseFloat(p.p) > 0) {
