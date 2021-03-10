@@ -13,15 +13,15 @@ const stratBBreEntry = class {
 
   constructor() {
     cron.schedule('*/5 * * * * *', () => {
-      this.ranges = new GetRanges();
       const res = this.detectEntryMinute();
       console.log(res)
     });
   }
 
   detectEntryMinute() {
+    this.ranges = new GetRanges();
     const bbMuliplier = 1;
-    const closeVals = this.ranges.getLastBB({}, bbMuliplier);
+    const closeVals = this.ranges.getLastBB(moment().startOf('minute'), bbMuliplier);
     const prevCloseMin = moment().subtract(1, 'minute').startOf('minute');
     const prevCloseVals = this.ranges.getLastBB(prevCloseMin, bbMuliplier);
 
