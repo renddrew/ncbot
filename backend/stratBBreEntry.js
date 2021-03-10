@@ -13,44 +13,70 @@ const stratBBreEntry = class {
 
   constructor() {
     this.ranges = new GetRanges();
+
+    cron.schedule('*/5 * * * * *', () => {
+      const res = this.detectEntryMinute();
+      console.log(res)
+    });
   }
 
-  detectEntryMinute(currentPrice) {
+  detectEntryMinute() {
     const bbMuliplier = 1;
-    const currentVals = this.ranges.getLastBB({}, bbMuliplier);
-    const lastMin = moment().subtract(1, 'minute');
-    const lastVals = this.ranges.getLastBB(lastMin, bbMuliplier);
+    const closeVals = this.ranges.getLastBB({}, bbMuliplier);
+    const prevCloseMin = moment().subtract(1, 'minute');
+    const prevCloseVals = this.ranges.getLastBB(prevCloseMin, bbMuliplier);
 
-    const currentUpperBB = currentVals.min1.bbUpper;
-    const currentLowerBB = currentVals.min1.bbLower;
-    const lastUpperBB = lastVals.min1.bbUpper;
-    const lastLowerBB = lastVals.min1.bbLower;
+    const closeUpperBB = closeVals.min1.bbUpper;
+    const closeLowerBB = closeVals.min1.bbLower;
+    const prevCloseUpperBB = prevCloseVals.min1.bbUpper;
+    const prevCloseLowerBB = prevCloseVals.min1.bbLower;
+
+    // open price is price of minute observed
+    // close price is close second price
+    const openPrice = closeVals.min1.p;
+    const prevClosePrice = prevCloseVals.min1.p;
 
     // upper re-entry condition
     let upperReEntry = false;
-    if (currentPrice < currentUpperBB && currentPrice > lastUpperBB) {
+    if (openPrice < closeUpperBB && prevClosePrice > prevCloseUpperBB) {
       upperReEntry = true;
     }
 
     let lowerReEntry = false;
-    if (currentPrice > currentLowerBB && currentPrice < lastLowerBB) {
+    if (openPrice > closeLowerBB && prevClosePrice < prevCloseLowerBB) {
       lowerReEntry = true;
     }
 
     const out = {
+      time: closeVals.min1.time,
       upperReEntry,
       lowerReEntry,
-      // current: currentVals.min1,
-      // last: lastVals.min1
+      prevClosePrice,
+      prevCloseUpperBB: closeVals.min1.bbUpper,
+      prevCloseLowerBB: closeVals.min1.bbLower,
+      // prevClose: prevCloseVals.min1
     };
 
+    if (closeVals.min1.maLength < 18) {
+      out.close = closeVals.min1;
+    }
+
+    if (!closeUpperBB) {
+      out.close = closeVals.min1;
+    }
+    if (!prevCloseLowerBB) {
+      out.prevClose = prevCloseVals.min1;
+    }
+
     if (upperReEntry || lowerReEntry) {
-      out.currentVals = currentVals;
-      out.lastVals = lastVals;
+      out.closeVals = closeVals;
+      out.prevCloseVals = prevCloseVals;
     }
 
     return out;
+
   }
+
 };
 
 module.exports = stratBBreEntry;

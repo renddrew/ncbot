@@ -29,12 +29,12 @@ const utils = {
 
     let variance = 0;
     for (let i = 0; i < valsList.length; i++) {
-      variance += ((valsList[i] - mean) * (valsList[i] - mean));      
+      variance += ((valsList[i] - mean) * (valsList[i] - mean));
     }
 
-    variance = Math.sqrt(variance / (valsList.length - 1));
+    variance = parseFloat(Math.sqrt(variance / (valsList.length - 1)));
 
-    return variance;
+    return variance > 0 ? variance : 0;
   }
 
 }

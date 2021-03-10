@@ -132,9 +132,9 @@ const GetRanges = class {
     const start15minEpoch = moment(retrieveTime).minute(start15minTime).format('x');
 
     for (let i = 0; i < maSize; i++) {
-      const time1min = parseInt(moment(retrieveTime).subtract(i, 'minute').format('x'));
-      const time5min = parseInt(moment(start5minEpoch - (i*(1000*60*5))).format('x'));
-      const time15min = parseInt(moment(start15minEpoch - (i*(1000*60*15))).format('x'));
+      const time1min = parseInt(moment(retrieveTime).subtract(i, 'minute').startOf('minute').format('x'));
+      const time5min = parseInt(moment(start5minEpoch - (i*(1000*60*5))).startOf('minute').format('x'));
+      const time15min = parseInt(moment(start15minEpoch - (i*(1000*60*15))).startOf('minute').format('x'));
       times1min.push(time1min);
       times5min.push(time5min);
       times15min.push(time15min);
@@ -159,14 +159,14 @@ const GetRanges = class {
     let priceTotal = 0;
     for (let i = 0; i < timeList.length; i++) {
       const p = this.allPeriodHist.find(itm => {
-        const minTime = itm.t - (1000*3);
-        const maxTime = itm.t + (1000*3);
+        const minTime = itm.t - (1000*1.5);
+        const maxTime = itm.t + (1000*1.5);
         return timeList[i] >= minTime && timeList[i] <= maxTime;
       });
-      if (p && p.p) {
+      if (p && parseFloat(p.p) > 0) {
         p.nt = moment(p.t).format('llll');
         itms.push(p);
-        priceTotal += parseInt(p.p);
+        priceTotal += parseFloat(p.p);
         maitms.push(p.p);
       }
     }
@@ -174,13 +174,17 @@ const GetRanges = class {
     const ma = priceTotal / itms.length;
     const stdDev = utils.calcStdDeviation(maitms);
     return {
-      time: moment(timeList[0]).tz('America/Toronto').format('llll'),
+      time: moment(timeList[0]).tz('America/Toronto').format('h:mm:ss SSS'),
+      serverTime: moment().tz('America/Toronto').format('h:mm:ss SSS'),
       ma,
       maLength: maitms.length,
       bbUpper: ma + (multiplier * stdDev),
       bbLower: ma - (multiplier * stdDev),
       p: itms[0] ? itms[0].p : null,
       multiplier,
+      stdDev,
+      maItmLen: itms.length,
+      priceTotal,
     };
   }
 
