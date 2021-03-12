@@ -5,6 +5,7 @@ const fs = require('fs');
 const utils = require('./utils');
 const { timeStamp } = require('console');
 const GetRanges = require('./get-ranges');
+const binanceRequests = require('./binance-requests');
 
 moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 
@@ -12,13 +13,17 @@ moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 const stratBBreEntry = class {
 
   constructor() {
-    cron.schedule('2 * * * * *', () => {
-      const res = this.detectEntryMinute();
+    cron.schedule('2 * * * * *', async () => {
+      const res = await this.detectEntryMinute();
       console.log(res)
     });
   }
 
-  detectEntryMinute() {
+  async detectEntryMinute() {
+    let doBuy = false;
+    let doSell = false;
+    let out = {};
+
     this.ranges = new GetRanges();
     const bbMuliplier = 1;
     const closeVals = this.ranges.getLastBB(moment().startOf('minute'), bbMuliplier);
@@ -46,15 +51,30 @@ const stratBBreEntry = class {
       lowerReEntry = true;
     }
 
-    const out = {
-      time: closeVals.min1.time,
-      upperReEntry,
-      lowerReEntry,
-      prevClosePrice,
-      prevCloseUpperBB: closeVals.min1.bbUpper,
-      prevCloseLowerBB: closeVals.min1.bbLower,
-      // prevClose: prevCloseVals.min1
-    };
+    if (lowerReEntry) {
+      out.lowerReEntry = lowerReEntry;
+      doBuy = true;
+    } else if (upperReEntry) {
+      out.upperReEntry = upperReEntry;
+      doSell = true;
+    }
+
+    if (doBuy || doSell) {
+      const balances = await binanceRequests.getBalances();
+      const balanceBTC = balances && balances.BTC.available ? parseFloat(balances.BTC.available) : 0;
+      const balanceUSDT = balances && balances.USDT.available ? parseFloat(balances.USDT.available) : 0;
+      out.balanceBTC = balanceBTC;
+      out.balanceUSDT = balanceUSDT;
+      if (doBuy && balanceUSDT > 11) {
+        out.action = 'BUY';
+      } else if (doSell && balanceBTC > 0.0002) {
+        out.action = 'SELL';
+      } else {
+        out.action = 'NONE';
+      }
+    }
+
+    out.time = closeVals.min1.time;
 
     if (closeVals.min1.maLength < 18) {
       out.close = closeVals.min1;
@@ -68,8 +88,8 @@ const stratBBreEntry = class {
     }
 
     if (upperReEntry || lowerReEntry) {
-      out.closeVals = closeVals;
-      out.prevCloseVals = prevCloseVals;
+      out.closeVals = closeVals.min1;
+      out.prevCloseVals = prevCloseVals.min1;
     }
 
     return out;
