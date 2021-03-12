@@ -35,8 +35,8 @@
     </b-taglist>
 
     <div class="action-buttons buttons is-centered">
-      <b-button @click="marketSell" type="is-danger">Sell</b-button>
-      <b-button @click="marketBuy" type="is-success">Buy</b-button>
+      <b-button @click="marketSell" type="is-danger" outlined>Sell</b-button>
+      <b-button @click="marketBuy" type="is-success" outlined>Buy</b-button>
     </div>
 
     <b-table :data="trades" :mobileCards=false class="is-size-7-mobile">
@@ -160,13 +160,14 @@ export default {
           })).json();
 
           if (res && res.result === 'buy') {
-            this.$buefy.snackbar.open({message: 'buy success', duration: 500});
+            this.$buefy.snackbar.open({message: 'buy success', duration: 1500});
             setTimeout(() => {
               this.getBalances();
               this.getTrades();
-            }, 2000);
+            }, 500);
           } else {
-            this.$buefy.snackbar.open({message: 'buy failed', duration: 500, type: 'is-danger'});
+            this.$buefy.snackbar.open({message: res.result, duration: 5000, type: 'is-danger'});
+            console.log(res)
           }
         }
       });
@@ -180,18 +181,19 @@ export default {
           const res = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/marketSell`, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
           })).json();
 
           if (res && res.result === 'sell') {
-            this.$buefy.snackbar.open({message: 'sell success', duration: 500});
+            this.$buefy.snackbar.open({ message: 'sell success', duration: 1500 });
             setTimeout(() => {
               this.getBalances();
               this.getTrades();
-            }, 2000);
+            }, 500);
           } else {
-            this.$buefy.snackbar.open({message: 'sell failed', duration: 500, type: 'is-danger'});
+            this.$buefy.snackbar.open({ message: res.result, duration: 5000, type: 'is-danger' });
+            console.log(res);
           }
         }
       });

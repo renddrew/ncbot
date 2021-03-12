@@ -78,34 +78,83 @@ const binanceRequests = {
     });
   },
 
-  marketBuy(qty) {
-    return new Promise((resolve, reject) => {
+  getPrice(pair) {
+    return new Promise((resolve) => {
+      binance.prices(pair, (error, ticker) => {
+        if (ticker && ticker[pair]) {
+          resolve(ticker[pair]);
+        } else {
+          resolve(0);
+        }
+      });
+    });
+  },
 
+  marketBuy(qty) {
+    return new Promise(async(resolve, reject) => {
       // change to if no qty provided, get balances and trade full balance
-      
-      qty = 0.0002;
+      if (!qty) {
+        const balances = await this.getBalances();
+        const price = await this.getPrice('BTCUSDT');
+        const usdt = balances.USDT && balances.USDT.available ? parseFloat(balances.USDT.available) : 0;
+        if (!price || !usdt) {
+          resolve('Failed, please retry or check balance');
+          return;
+        }
+        const btcValue = usdt / parseFloat(price);
+        // reduce by %1 to allow for flucutating price
+        qty = btcValue * 0.99;
+      }
+      if (!qty) {
+        resolve('Problem calculating trade amount');
+        return;
+      }
+
+      // format precision
+      qty = utils.formatNum(qty, 6);
+
       binance.marketBuy('BTCUSDT', qty, (error, response) => {
         if (response.status === 'FILLED') {
           resolve('buy');
+          return;
         }
-        reject(error);
+        resolve(error.body);
+        console.log(error);
       });
     });
   },
 
   marketSell(qty) {
-    return new Promise((resolve, reject) => {
-      qty = 0.0002;
+    return new Promise(async(resolve) => {
+      if (!qty) {
+        const balances = await this.getBalances();
+        let btcValue = balances.BTC && balances.BTC.available ? parseFloat(balances.BTC.available) : 0;
+        if (!btcValue) {
+          resolve('Failed, please retry or check balance');
+          return;
+        }
+        btcValue = parseFloat(btcValue);
+        // reduce by %1 to allow for flucutating price
+        qty = btcValue * 0.99;
+      }
+      if (!qty) {
+        resolve('Problem calculating trade amount');
+        return;
+      }
+
+      // format precision
+      qty = utils.formatNum(qty, 6);
+
       binance.marketSell('BTCUSDT', qty, (error, response) => {
         if (response.status === 'FILLED') {
           resolve('sell');
+          return;
         }
-        reject(error);
+        resolve(error.body);
+        console.log(error);
       });
     });
   },
-
-
 }
 
 module.exports = binanceRequests;
