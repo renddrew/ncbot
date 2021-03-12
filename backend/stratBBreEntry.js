@@ -66,8 +66,12 @@ const stratBBreEntry = class {
       out.balanceBTC = balanceBTC;
       out.balanceUSDT = balanceUSDT;
       if (doBuy && balanceUSDT > 11) {
+        const buyRes = await binanceRequests.marketBuy();
+        out.buyRes = buyRes;
         out.action = 'BUY';
       } else if (doSell && balanceBTC > 0.0002) {
+        const sellRes = await binanceRequests.marketSell();
+        out.sellRes = sellRes;
         out.action = 'SELL';
       } else {
         out.action = 'NONE';
