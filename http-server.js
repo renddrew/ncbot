@@ -24,4 +24,14 @@ app.post('/getRanges', async (req, res) => {
   res.send({ rangeVals });
 });
 
+app.post('/marketBuy', async (req, res) => {
+  const result = await binanceRequests.marketBuy();
+  res.send({ result });
+});
+
+app.post('/marketSell', async (req, res) => {
+  const result = await binanceRequests.marketSell();
+  res.send({ result });
+});
+
 module.exports = app;

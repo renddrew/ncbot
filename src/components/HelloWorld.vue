@@ -34,6 +34,11 @@
       <b-tag :type="ranges.shortUptrend ? 'is-success' : 'is-danger'">30 min</b-tag>
     </b-taglist>
 
+    <div class="action-buttons buttons is-centered">
+      <b-button @click="marketSell" type="is-danger">Sell</b-button>
+      <b-button @click="marketBuy" type="is-success">Buy</b-button>
+    </div>
+
     <b-table :data="trades" :mobileCards=false class="is-size-7-mobile">
       <b-table-column field="isBuyer" v-slot="props">
           <span :class="['tag', props.row.isBuyer ? 'is-success' : 'is-danger']">
@@ -142,6 +147,56 @@ export default {
       this.ranges = rangeRes.rangeVals;
     },
 
+    marketBuy() {
+      this.$buefy.dialog.confirm({
+        message: 'Confirm buy?',
+        type: 'is-success',
+        onConfirm: async () => {
+          const res = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/marketBuy`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+          })).json();
+
+          if (res && res.result === 'buy') {
+            this.$buefy.snackbar.open({message: 'buy success', duration: 500});
+            setTimeout(() => {
+              this.getBalances();
+              this.getTrades();
+            }, 2000);
+          } else {
+            this.$buefy.snackbar.open({message: 'buy failed', duration: 500, type: 'is-danger'});
+          }
+        }
+      });
+    },
+
+    marketSell() {
+      this.$buefy.dialog.confirm({
+        message: 'Confirm sell?',
+        type: 'is-danger',
+        onConfirm: async () => {
+          const res = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/marketSell`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+          })).json();
+
+          if (res && res.result === 'sell') {
+            this.$buefy.snackbar.open({message: 'sell success', duration: 500});
+            setTimeout(() => {
+              this.getBalances();
+              this.getTrades();
+            }, 2000);
+          } else {
+            this.$buefy.snackbar.open({message: 'sell failed', duration: 500, type: 'is-danger'});
+          }
+        }
+      });
+    },
+
     niceTime(ts) {
       return moment.unix(ts/1000).format('MMM Do YYYY h:mm a')
     },
@@ -206,6 +261,10 @@ export default {
     .tag {
       min-width:60px;
     }
+  }
+
+  .Xaction-buttons {
+    text-align:center;
   }
 
 </style>

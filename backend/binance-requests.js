@@ -3,8 +3,14 @@ const Binance = require('node-binance-api');
 const utils = require('./utils');
 
 const binance = new Binance().options({
-  APIKEY: 'i4dMaSxv6iCaZSR8tPUJCQxBmfJVOYRG37enQJHMHMx05JKDSLIdAFX7hxQOo09M',
-  APISECRET: 'f8Y0HqCDu8lFpXOhvuNYGafmd2t27IRmFJqctXsFhjM91gbbP0GuN2HLuD206CPt'
+  // main account renddrew@gmail.com
+  // APIKEY: 'i4dMaSxv6iCaZSR8tPUJCQxBmfJVOYRG37enQJHMHMx05JKDSLIdAFX7hxQOo09M',
+  // APISECRET: 'f8Y0HqCDu8lFpXOhvuNYGafmd2t27IRmFJqctXsFhjM91gbbP0GuN2HLuD206CPt'
+
+  // bot trade account rend.drew@gmail.com
+  APIKEY: 'D9KzEBG6N23khpUqIRy0hM9EWwU9Ix7sF7lEUBspCcWaQZgLtVHTZOuZVPfOhUFe',
+  APISECRET: 'rNA1bvQ3S4FJFmJ1Rn2239JLUjSwLx5K9nQGZ6OWN2AEM1BtynHUfq38Y6Lxdvad'
+
 });
 
 const binanceRequests = {
@@ -64,56 +70,42 @@ const binanceRequests = {
     });
   },
 
-  syncTradeHist(groupedTrades) {
-
-    /*
-    return new Promise((resolve) => {
-      const dateFileStr = './backend/db/tradeHist.stormdb';
-      const dbEngine = new StormDB.localFileEngine(dateFileStr, {
-        async: true,
-      });
-      const tradeDb = new StormDB(dbEngine);
-      const savedTrades = tradeDb.get('trades').value();
-      let missingTrades = [];
-
-      for (let i = 0; i < groupedTrades.length; i++) {
-        let hasSaved = false;
-        for (let si = 0; si < savedTrades.length; si++) {
-          if (groupedTrades[i].orderId === savedTrades[si]) {
-            hasSaved = true;
-          }
-        }
-        if (!hasSaved) {
-          missingTrades.push(groupedTrades[i]);
-        }
-      }
-
-      missingTrades.sort((a, b) => {
-        return a.time > b.time;
-      });
-
-      /*
-      const timeNow = new Date().getTime();
-      if (missingTrades[missingTrades.length]).time > (timeNow + (60*1000)) {
-        const balances = await getBalances();
-        // calculate balance in USD using BTC and USDT and add to trade then add amount to trade stats
-      }
-
-      tradeDb.get('trades').push(missingTrades);
-      await tradeDb.save();
-
-      resolve();
-    });
-    */
-  },
-
   getBalances() {
     return new Promise((resolve) => {
       binance.balance((error, balances) => {
         resolve(balances);
       });
     });
-  }
+  },
+
+  marketBuy(qty) {
+    return new Promise((resolve, reject) => {
+
+      // change to if no qty provided, get balances and trade full balance
+      
+      qty = 0.0002;
+      binance.marketBuy('BTCUSDT', qty, (error, response) => {
+        if (response.status === 'FILLED') {
+          resolve('buy');
+        }
+        reject(error);
+      });
+    });
+  },
+
+  marketSell(qty) {
+    return new Promise((resolve, reject) => {
+      qty = 0.0002;
+      binance.marketSell('BTCUSDT', qty, (error, response) => {
+        if (response.status === 'FILLED') {
+          resolve('sell');
+        }
+        reject(error);
+      });
+    });
+  },
+
+
 }
 
 module.exports = binanceRequests;
