@@ -12,6 +12,7 @@
     "syncLocalDb": "rsync -avz root@157.230.215.44:/var/www/html/backend/db/ ~/documents/web/nodecbot/backend/db"
   },
   "dependencies": {
+    "body-parser": "^1.19.0",
     "buefy": "^0.9.4",
     "core-js": "^3.6.5",
     "cors": "^2.8.5",

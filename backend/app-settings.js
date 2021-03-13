@@ -13,18 +13,22 @@ const AppSettings = class {
   constructor() {
     const dbLocation = './backend/db/appSettings.stormdb';
     let engine = new StormDB.localFileEngine(dbLocation);
-    this.db = new StormDB(engine);
+    this.db = new StormDB(engine, { async: true });
     this.db.default({ settings: {} });
   }
 
-  getSettings() {
-    return this.db.get('settings').value();
+  getSettings(key) {
+    key = key || 'settings';
+    return this.db.get(key).value();
   }
 
   saveSettings(obj) {
-    return this.db.set(obj).save();
+    const settings = this.getSettings();
+    Object.keys(obj).forEach(key => {
+      settings[key] = obj[key];
+    });
+    this.db.set('settings', settings).save();
   }
-
 }
 
 module.exports = AppSettings;

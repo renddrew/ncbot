@@ -39,6 +39,23 @@
       <b-button @click="marketBuy" type="is-success" outlined>Buy</b-button>
     </div>
 
+    <div>
+      <b-field label="">
+        <b-select 
+          v-model="autoTrade"
+          placeholder="Auto Trading"
+          @input="saveSettings"
+        >
+          <option
+            v-for="option in [{ name: 'On', val: 'on'},{ name: 'Off', val: 'off' }]"
+            :value="option.val"
+            :key="option.val">
+            {{ option.name }}
+          </option>
+        </b-select>
+      </b-field>
+    </div>
+
     <b-table :data="trades" :mobileCards=false class="is-size-7-mobile">
       <b-table-column field="isBuyer" v-slot="props">
           <span :class="['tag', props.row.isBuyer ? 'is-success' : 'is-danger']">
@@ -88,7 +105,8 @@ export default {
       msg: null,
       trades: [],
       balances: [],
-      ranges: {}
+      ranges: {},
+      autoTrade: 'off',
     }
   },
 
@@ -195,8 +213,35 @@ export default {
             this.$buefy.snackbar.open({ message: res.result, duration: 5000, type: 'is-danger' });
             console.log(res);
           }
-        }
+        },
       });
+    },
+
+    async getSettings() {
+      const res = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/getSettings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })).json();
+
+      if (res.autoTrade) {
+        this.autoTrade = res.autoTrade;
+      }
+
+      console.log(res);
+    },
+
+    async saveSettings() {
+      const body = JSON.stringify({ autoTrade: this.autoTrade });
+      const res = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/saveSettings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body
+      })).json();
+      console.log(res);
     },
 
     niceTime(ts) {
@@ -214,6 +259,7 @@ export default {
     this.getTrades();
     this.getBalances();
     this.getRanges();
+    this.getSettings();
 
      new TradingView.widget({
       "width": '100%',
