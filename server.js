@@ -7,8 +7,6 @@ const SavePriceHistory = require('./backend/save-price-history');
 const GetRanges = require('./backend/get-ranges');
 const StratBBreEntry = require('./backend/stratBBreEntry');
 const cron = require('node-cron');
-
-
 const moment = require('moment-timezone');
 moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 
@@ -65,13 +63,13 @@ server.listen(8080, () => {
 
 // save price history once every server time second
 const ph = new SavePriceHistory();
-cron.schedule('* * * * * *', () => {
+cron.schedule('*/5 * * * * *', () => {
   ph.addPriceHistory(lastPrice);
 });
 
 
 // start strategy
-const st = new StratBBreEntry();
+// const st = new StratBBreEntry();
 
 
 

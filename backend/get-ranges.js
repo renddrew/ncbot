@@ -20,22 +20,34 @@ const GetRanges = class {
   }
 
   getPeriodHistory() {
-    const dateFile = moment().format('YYYY-MM-DD');
-    const currentHour = parseInt(moment().format('H'));
     const dateFileDir = './backend/db/btcusdt';
-    const histHours = 4;
+    const histHours = 5;
 
     this.allPeriodHist = [];
     this.shortPeriodHist = [];
     this.mediumPeriodHist = [];
     this.longPeriodHist = [];
 
+    const currentHour = parseInt(moment().format('H'));
+    let dateFile = '';
+
     this.allPeriodHist = [];
     for (let i = 0; i < histHours; i++) {
       let hourCalc = currentHour - i;
-      let db = `${dateFileDir}/${dateFile}-${hourCalc}.stormdb`;
+
+      if (hourCalc < 0) {
+        dateFile = moment().subtract(1, 'day').hour(24+hourCalc).format('YYYY-MM-DD-H');
+      } else {
+        dateFile = moment().hour(hourCalc).format('YYYY-MM-DD-H');
+      }
+
+      let db = `${dateFileDir}/${dateFile}.stormdb`;
       let engine = new StormDB.localFileEngine(db);
       let vals = (new StormDB(engine)).get('history').value();
+      // console.log({
+      //   db,
+      //   vals: vals && vals.length ? vals.length : 0
+      // })
       if (!vals || !vals.length) continue;
       this.allPeriodHist = this.allPeriodHist.concat(vals);
     }

@@ -13,7 +13,7 @@ moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 const stratBBreEntry = class {
 
   constructor() {
-    cron.schedule('2 * * * * *', async () => {
+    cron.schedule('*/5 * * * * *', async () => {
       const res = await this.detectEntryMinute();
       console.log(res)
     });
@@ -26,14 +26,16 @@ const stratBBreEntry = class {
 
     this.ranges = new GetRanges();
     const bbMuliplier = 1;
+    const timeFrameBasisKey = 'min15';
+
     const closeVals = this.ranges.getLastBB(moment().startOf('minute'), bbMuliplier);
     const prevCloseMin = moment().startOf('minute').subtract(1, 'minute');
     const prevCloseVals = this.ranges.getLastBB(prevCloseMin, bbMuliplier);
 
-    const closeUpperBB = closeVals.min1.bbUpper;
-    const closeLowerBB = closeVals.min1.bbLower;
-    const prevCloseUpperBB = prevCloseVals.min1.bbUpper;
-    const prevCloseLowerBB = prevCloseVals.min1.bbLower;
+    const closeUpperBB = closeVals[timeFrameBasisKey].bbUpper;
+    const closeLowerBB = closeVals[timeFrameBasisKey].bbLower;
+    const prevCloseUpperBB = prevCloseVals[timeFrameBasisKey].bbUpper;
+    const prevCloseLowerBB = prevCloseVals[timeFrameBasisKey].bbLower;
 
     // open price is price of minute observed
     // close price is close second price
@@ -51,6 +53,20 @@ const stratBBreEntry = class {
       lowerReEntry = true;
     }
 
+    // Ideas:
+    // 1.
+    // add condition to only sell if crossing the MA if short and medium uptrend
+    // add condition to only buy if crossing the MA if short and medium downtrend
+
+    // 2.
+    // adjust standard deviation according to uptrend and downtrend. if uptrend decrease lower stdDev andn increase upper to result in having the system buy sooner and sell later 
+    // probably need to rewrite helper funcs to separate getting MA, getting BB in order to use directly within strategies for more options
+
+    // 3.
+    // add stoploss buy/sell action - when price is in a medium and short trend, do the buy or sell
+
+    let enableTrading = false;
+
     if (lowerReEntry) {
       out.lowerReEntry = lowerReEntry;
       doBuy = true;
@@ -65,35 +81,37 @@ const stratBBreEntry = class {
       const balanceUSDT = balances && balances.USDT.available ? parseFloat(balances.USDT.available) : 0;
       out.balanceBTC = balanceBTC;
       out.balanceUSDT = balanceUSDT;
-      if (doBuy && balanceUSDT > 11) {
-        const buyRes = await binanceRequests.marketBuy();
-        out.buyRes = buyRes;
-        out.action = 'BUY';
-      } else if (doSell && balanceBTC > 0.0002) {
-        const sellRes = await binanceRequests.marketSell();
-        out.sellRes = sellRes;
-        out.action = 'SELL';
+      if (doBuy) {
+        if (enableTrading && balanceUSDT > 11) {
+          const buyRes = await binanceRequests.marketBuy();
+          out.action = buyRes;
+        }
+        out.trigger = 'BUY';
       } else {
-        out.action = 'NONE';
+        if (enableTrading && balanceBTC > 0.0002) {
+          const sellRes = await binanceRequests.marketSell();
+          out.action = sellRes;
+        }
+        out.trigger = 'SELL';
       }
     }
 
     out.time = closeVals.min1.time;
 
-    if (closeVals.min1.maLength < 18) {
-      out.close = closeVals.min1;
+    if (closeVals[timeFrameBasisKey].maLength < 18) {
+      out.close = closeVals[timeFrameBasisKey];
     }
 
     if (!closeUpperBB) {
-      out.close = closeVals.min1;
+      out.close = closeVals[timeFrameBasisKey];
     }
     if (!prevCloseLowerBB) {
-      out.prevClose = prevCloseVals.min1;
+      out.prevClose = prevCloseVals[timeFrameBasisKey];
     }
 
     if (upperReEntry || lowerReEntry) {
-      out.closeVals = closeVals.min1;
-      out.prevCloseVals = prevCloseVals.min1;
+      out.closeVals = closeVals[timeFrameBasisKey];
+      out.prevCloseVals = prevCloseVals[timeFrameBasisKey];
     }
 
     return out;
