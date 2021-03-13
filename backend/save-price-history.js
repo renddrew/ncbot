@@ -9,18 +9,13 @@ moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 // https://www.npmjs.com/package/stormdb
 
 const SavePriceHistory = class {
-
-  constructor() {
-    let priceHistDb = null;
-
-    this.setDateFile();
-
-    cron.schedule('* * * * *', () => {
-      this.setDateFile();
-    });
+  constructor(lastPrice) {
+    this.lastPrice = lastPrice;
+    this.savePrice();
   }
 
-  setDateFile() {
+  // should move database class inst to be global shared, could be causing data loss somehow
+  savePrice() {
     const dateFile = moment().format('YYYY-MM-DD-H');
     const dirpath = './backend/db/btcusdt';
     fs.mkdirSync(dirpath, { recursive: true });
@@ -28,16 +23,12 @@ const SavePriceHistory = class {
     const dbEngine = new StormDB.localFileEngine(dateFileStr, {
       async: false,
     });
-    this.priceHistDb = new StormDB(dbEngine);
-  }
-
-  addPriceHistory(lastPrice) {
-    this.priceHistDb.default({ history: [] });
+    const currentDb = new StormDB(dbEngine);
     const time = (new Date()).getTime();
-    if (!lastPrice) return;
-    this.priceHistDb.get('history').push({ t: time, p: lastPrice });
-    this.priceHistDb.save(); // async
+    if (!this.lastPrice) return;
+    currentDb.get('history').push({ t: time, p: this.lastPrice });
+    currentDb.save(); // async
   }
-}
+};
 
 module.exports = SavePriceHistory;

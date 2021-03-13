@@ -44,10 +44,10 @@ const GetRanges = class {
       let db = `${dateFileDir}/${dateFile}.stormdb`;
       let engine = new StormDB.localFileEngine(db);
       let vals = (new StormDB(engine)).get('history').value();
-      // console.log({
-      //   db,
-      //   vals: vals && vals.length ? vals.length : 0
-      // })
+      console.log({
+        db,
+        vals: vals && vals.length ? vals.length : 0
+      })
       if (!vals || !vals.length) continue;
       this.allPeriodHist = this.allPeriodHist.concat(vals);
     }
@@ -195,9 +195,6 @@ const GetRanges = class {
       bbLower: ma - (multiplier * stdDev),
       p: itms[0] ? itms[0].p : null,
       multiplier,
-      stdDev,
-      maItmLen: itms.length,
-      priceTotal,
     };
   }
 

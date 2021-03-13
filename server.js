@@ -62,9 +62,8 @@ server.listen(8080, () => {
 });
 
 // save price history once every server time second
-const ph = new SavePriceHistory();
 cron.schedule('*/5 * * * * *', () => {
-  ph.addPriceHistory(lastPrice);
+  const ph = new SavePriceHistory(lastPrice);
 });
 
 
