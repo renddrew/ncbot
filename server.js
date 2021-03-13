@@ -68,7 +68,7 @@ cron.schedule('*/5 * * * * *', () => {
 
 
 // start strategy
-// const st = new StratBBreEntry();
+const st = new StratBBreEntry();
 
 
 

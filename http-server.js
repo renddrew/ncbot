@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const binanceRequests = require('./backend/binance-requests');
 const GetRanges = require('./backend/get-ranges');
+const AppSettings = require('./backend/app-settings');
 
 const app = express();
 app.use(cors());

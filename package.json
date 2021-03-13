@@ -19,6 +19,7 @@
     "express-ws": "^4.0.0",
     "fs": "0.0.1-security",
     "http": "^0.0.1-security",
+    "lowdb": "^1.0.0",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.33",
     "node-binance-api": "^0.12.4",
