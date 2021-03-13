@@ -40,7 +40,7 @@
     </div>
 
     <div>
-      <b-field label="">
+      <b-field label="Auto Trade">
         <b-select 
           v-model="autoTrade"
           placeholder="Auto Trading"
@@ -55,6 +55,8 @@
         </b-select>
       </b-field>
     </div>
+
+    <br><br>
 
     <b-table :data="trades" :mobileCards=false class="is-size-7-mobile">
       <b-table-column field="isBuyer" v-slot="props">
@@ -226,10 +228,9 @@ export default {
       })).json();
 
       if (res.autoTrade) {
+        this.$buefy.snackbar.open({ message: 'got settings', duration: 500, type: 'is-success' });
         this.autoTrade = res.autoTrade;
       }
-
-      console.log(res);
     },
 
     async saveSettings() {
@@ -241,6 +242,11 @@ export default {
         },
         body
       })).json();
+      if (res === 'success') {
+        this.$buefy.snackbar.open({ message: 'Saved', duration: 500, type: 'is-success' });
+      } else {
+        this.$buefy.snackbar.open({ message: 'Save failed', duration: 5000, type: 'is-danger' });
+      }
       console.log(res);
     },
 

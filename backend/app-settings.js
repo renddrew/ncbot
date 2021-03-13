@@ -12,8 +12,8 @@ moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 const AppSettings = class {
   constructor() {
     const dbLocation = './backend/db/appSettings.stormdb';
-    let engine = new StormDB.localFileEngine(dbLocation);
-    this.db = new StormDB(engine, { async: true });
+    let engine = new StormDB.localFileEngine(dbLocation, { async: true });
+    this.db = new StormDB(engine);
     this.db.default({ settings: {} });
   }
 
@@ -23,17 +23,16 @@ const AppSettings = class {
   }
 
   saveSettings(obj) {
-    const settings = this.getSettings();
-    Object.keys(obj).forEach(key => {
-      settings[key] = obj[key];
+    return new Promise((resolve) => {
+      const settings = this.getSettings();
+      Object.keys(obj).forEach((key) => {
+        settings[key] = obj[key];
+      });
+      this.db.set('settings', settings).save().then(() => {
+        resolve('success');
+      });
     });
-    this.db.set('settings', settings).save();
   }
-}
+};
 
 module.exports = AppSettings;
-
-
-
-
-

@@ -41,7 +41,7 @@ app.post('/saveSettings', async (req, res) => {
   const obj = { setting1: 'on' };
   const ap = new AppSettings();
   const result = await ap.saveSettings(req.body);
-  res.sendStatus(200);
+  res.send(JSON.stringify(result));
 });
 
 app.post('/getSettings', async (req, res) => {

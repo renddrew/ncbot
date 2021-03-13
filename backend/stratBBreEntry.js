@@ -6,16 +6,20 @@ const utils = require('./utils');
 const { timeStamp } = require('console');
 const GetRanges = require('./get-ranges');
 const binanceRequests = require('./binance-requests');
+const AppSettings = require('./app-settings');
+const { settings } = require('cluster');
 
 moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 
-
 const stratBBreEntry = class {
-
   constructor() {
     cron.schedule('*/5 * * * * *', async () => {
-      const res = await this.detectEntryMinute();
-      console.log(res)
+      const sdb = new AppSettings();
+      const appSettings = sdb.getSettings();
+      if (appSettings && appSettings.autoTrade === 'on') {
+        const res = await this.detectEntryMinute();
+        console.log(res)
+      }
     });
   }
 
