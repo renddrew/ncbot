@@ -30,7 +30,7 @@ const stratBBreEntry = class {
 
     this.ranges = new GetRanges();
     const bbMuliplier = 1;
-    const timeFrameBasisKey = 'min1';
+    const timeFrameBasisKey = 'min15';
 
     const closeVals = this.ranges.getLastBB(moment().startOf('minute'), bbMuliplier);
     const prevCloseMin = moment().startOf('minute').subtract(1, 'minute');
@@ -68,6 +68,46 @@ const stratBBreEntry = class {
 
     // 3.
     // add stoploss buy/sell action - when price is in a medium and short trend, do the buy or sell
+
+    const tradeLog = {
+      trigger: '',
+      action: '',
+      p: 0,
+      t: 0,
+      balances: {
+        btc: 0,
+        usdt: 0,
+      },
+      indicators: {
+        min1: {
+          t: 0,
+          ma20: 0,
+          stdDevMultiUpper: 0,
+          stdDevMultiLower: 0,
+          bbUpper: 0,
+          bbLower: 0,
+          stdDev: 0,
+        },
+        min5: {
+          t: 0,
+          ma20: 0,
+          stdDevMultiUpper: 0,
+          stdDevMultiLower: 0,
+          bbUpper: 0,
+          bbLower: 0,
+          stdDev: 0,
+        },
+        min15: {
+          t: 0,
+          ma20: 0,
+          stdDevMultiUpper: 0,
+          stdDevMultiLower: 0,
+          bbUpper: 0,
+          bbLower: 0,
+          stdDev: 0,
+        },
+      },
+    };
 
     let enableTrading = false;
 
