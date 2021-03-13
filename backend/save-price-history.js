@@ -25,7 +25,7 @@ const SavePriceHistory = class {
     fs.mkdirSync(dirpath, { recursive: true });
     const dateFileStr = `${dirpath}/${dateFile}.stormdb`;
     const dbEngine = new StormDB.localFileEngine(dateFileStr, {
-      async: true,
+      async: false,
     });
     const currentDb = new StormDB(dbEngine);
     currentDb.default({ history: [] });

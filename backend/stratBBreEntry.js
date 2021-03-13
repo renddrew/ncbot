@@ -26,7 +26,7 @@ const stratBBreEntry = class {
 
     this.ranges = new GetRanges();
     const bbMuliplier = 1;
-    const timeFrameBasisKey = 'min15';
+    const timeFrameBasisKey = 'min1';
 
     const closeVals = this.ranges.getLastBB(moment().startOf('minute'), bbMuliplier);
     const prevCloseMin = moment().startOf('minute').subtract(1, 'minute');
