@@ -90,7 +90,7 @@ const TradeLog = class {
 
       if (params && params.filterTrades) {
         data.filter((itm) => {
-          return itm.action;
+          return itm.trigger;
         });
       }
 

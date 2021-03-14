@@ -33,10 +33,10 @@ const stratBBreEntry = class {
     let doSell = false;
     this.ranges = new GetRanges();
     const bbMuliplier = 1;
-    const timeFrameBasisKey = 'min15';
+    const timeFrameBasisKey = 'min5';
 
     const { tradeLog } = this.tl;
-    tradeLog.strategy = 'BB Re-Entry min15';
+    tradeLog.strategy = 'BB Re-Entry min5';
     tradeLog.ts = (new Date()).getTime();
 
     const closeVals = this.ranges.getLastBB(moment().startOf('minute'), bbMuliplier);
@@ -56,6 +56,13 @@ const stratBBreEntry = class {
     // close price is close second price
     const openPrice = closeVals.min1.p;
     const prevClosePrice = prevCloseVals.min1.p;
+
+    let enableTrading = this.enableTrading;
+
+    // disable trading if MA too low for time period
+    if (closeVals[timeFrameBasisKey].maLen < 15) {
+      enableTrading = false;
+    }
 
     // upper re-entry condition
     let upperReEntry = false;
@@ -97,14 +104,14 @@ const stratBBreEntry = class {
       tradeLog.balances.btc = balanceBTC;
       tradeLog.balances.usdt = balanceUSDT;
       if (doBuy) {
-        if (this.enableTrading && balanceUSDT > 11) {
+        if (enableTrading && balanceUSDT > 11) {
           const buyRes = await binanceRequests.marketBuy();
           if (buyRes === 'buy') {
             tradeLog.action = 'BUY';
           }
         }
       } else {
-        if (this.enableTrading && balanceBTC > 0.0002) {
+        if (enableTrading && balanceBTC > 0.0002) {
           const sellRes = await binanceRequests.marketSell();
           if (sellRes === 'sell') {
             tradeLog.action = 'SELL';
@@ -113,11 +120,12 @@ const stratBBreEntry = class {
       }
     }
     this.tl.addTradeLog(tradeLog);
-    
+
     if (tradeLog.action) {
-      //  console.log(tradeLog)
+      console.log(tradeLog);
     }
 
+    console.log({t: tradeLog.t, enableTrading});
   }
 };
 
