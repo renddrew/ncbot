@@ -45,10 +45,10 @@ const GetRanges = class {
       const db = low(adapter);
       
       let vals = db.get('history').value();
-      console.log({
-        dateFile,
-        vals: vals && vals.length ? vals.length : 0
-      })
+      // console.log({
+      //   dateFile,
+      //   vals: vals && vals.length ? vals.length : 0
+      // })
       if (!vals || !vals.length) continue;
       this.allPeriodHist = this.allPeriodHist.concat(vals);
     }
