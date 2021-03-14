@@ -57,10 +57,27 @@
     </div>
 
     <a
-      v-html="showTradeLog ? 'Hide Log' : 'Show Log'"
-      @click="showTradeLog = !showTradeLog" class="is-link"
-      style="display:block;margin:10px;text-decoration:underline"
+      v-if="!showTradeLog"
+      v-html="'Show Trades'"
+      @click="getTradeLog(true)"
+       class="is-link"
+      style="display:inline-block;margin:10px;text-decoration:underline"
     />
+    <a
+      v-if="!showTradeLog"
+      v-html="'Show Log'"
+      @click="getTradeLog()"
+      class="is-link"
+      style="display:inline-block;margin:10px;text-decoration:underline"
+    />
+    <a
+      v-if="showTradeLog"
+      v-html="'Hide Log'"
+      @click="showTradeLog = false"
+      class="is-link"
+      style="display:inline-block;margin:10px;text-decoration:underline"
+    />
+
     <div v-if="showTradeLog" class="trade-log has-text-left has-text-underlined">
       <pre>
         {{ tradeLog }}
@@ -265,16 +282,23 @@ export default {
       return moment.unix(ts/1000).format('MMM Do YYYY h:mm a');
     },
 
-    async getTradeLog() {
+    async getTradeLog(tradesOnly) {
+      const params = {};
+      if (tradesOnly) {
+        params.filterTrades = true;
+      }
+      console.log(params)
       const res = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/getTradeLog`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify(params)
       })).json();
 
       if (res.data) {
         this.tradeLog = res.data;
+        this.showTradeLog = true;
       }
     },
 
@@ -308,14 +332,6 @@ export default {
       "container_id": "tradingview_3194a"
     });
   },
-
-  watch: {
-    showTradeLog() {
-      if (this.showTradeLog) {
-        this.getTradeLog();
-      }
-    }
-  }
 };
 
 </script>

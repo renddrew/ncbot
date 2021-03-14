@@ -113,7 +113,7 @@ const stratBBreEntry = class {
     this.tl.addTradeLog(tradeLog);
     
     if (tradeLog.action) {
-      console.log(tradeLog)
+      //  console.log(tradeLog)
     }
 
   }

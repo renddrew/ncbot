@@ -39,7 +39,6 @@ app.post('/marketSell', async (req, res) => {
 });
 
 app.post('/saveSettings', async (req, res) => {
-  const obj = { setting1: 'on' };
   const ap = new AppSettings();
   const result = await ap.saveSettings(req.body);
   res.send(JSON.stringify(result));
@@ -53,9 +52,11 @@ app.post('/getSettings', async (req, res) => {
 
 app.post('/getTradeLog', async (req, res) => {
   const tl = new TradeLog();
-  const data = tl.getLogs({
-    filterTrades: true
-  });
+  const params = {};
+  if (req.body && req.body.filterTrades) {
+    params.filterTrades = req.body.filterTrades;
+  }
+  const data = await tl.getLogs(params);
   res.send({ data });
 });
 

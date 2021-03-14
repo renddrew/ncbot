@@ -73,31 +73,37 @@ const TradeLog = class {
   }
 
   getLogs(params) {
-    let { dateFile } = this;
-    let db = null;
-    if (params && params.date) {
-      dateFile = moment(params.date).format('YYYY-MM-DD');
-      const dateFileStr = `${this.dirpath}/${dateFile}.stormdb`;
-      const engine = new StormDB.localFileEngine(dateFileStr, { async: true });
-      db = new StormDB(engine);
-    } else {
-      // use current db
-      db = this.db;
-    }
+    return new Promise((resolve, reject) => {
+      let { dateFile } = this;
+      let db = null;
+      if (params && params.date) {
+        dateFile = moment(params.date).format('YYYY-MM-DD');
+        const dateFileStr = `${this.dirpath}/${dateFile}.stormdb`;
+        const engine = new StormDB.localFileEngine(dateFileStr, { async: true });
+        db = new StormDB(engine);
+      } else {
+        // use current db
+        db = this.db;
+      }
 
-    let data = db.get('log');
+      let data = db.get('log');
 
-    if (params && params.filterTrades) {
+      if (params && params.filterTrades) {
+        data.filter((itm) => {
+          return itm.action;
+        });
+      }
+
       data.filter((itm) => {
-        return itm.action;
+        return itm.ts;
       });
-    }
 
-    data.sort((a, b) => {
-      return a.ts - b.ts;
+      data.sort((a, b) => {
+        return b.ts - a.ts;
+      });
+
+      resolve(data.value());
     });
-
-    return data.value();
   }
 };
 
