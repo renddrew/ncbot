@@ -4,6 +4,7 @@ const cors = require('cors');
 const binanceRequests = require('./backend/binance-requests');
 const GetRanges = require('./backend/get-ranges');
 const AppSettings = require('./backend/app-settings');
+const TradeLog = require('./backend/trade-log');
 
 const app = express();
 app.use(cors());
@@ -48,6 +49,14 @@ app.post('/getSettings', async (req, res) => {
   const ap = new AppSettings();
   const result = await ap.getSettings('settings');
   res.send(result);
+});
+
+app.post('/getTradeLog', async (req, res) => {
+  const tl = new TradeLog();
+  const data = tl.getLogs({
+    filterTrades: true
+  });
+  res.send({ data });
 });
 
 

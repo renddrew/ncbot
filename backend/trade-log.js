@@ -7,11 +7,11 @@ moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 
 const TradeLog = class {
   constructor() {
-    const dateFile = moment().format('YYYY-MM-DD');
-    const dirpath = './backend/db/tradeLog/btcusdt';
-    fs.mkdirSync(dirpath, { recursive: true });
-    const dateFileStr = `${dirpath}/${dateFile}.stormdb`;
-    const engine = new StormDB.localFileEngine(dateFileStr, { async: true });
+    this.dateFile = moment().format('YYYY-MM-DD');
+    this.dirpath = './backend/db/tradeLog/btcusdt';
+    fs.mkdirSync(this.dirpath, { recursive: true });
+    this.dateFileStr = `${this.dirpath}/${this.dateFile}.stormdb`;
+    const engine = new StormDB.localFileEngine(this.dateFileStr, { async: true });
     this.db = new StormDB(engine);
     this.db.default({ log: [] });
 
@@ -22,6 +22,7 @@ const TradeLog = class {
       strategy: '',
       p: 0,
       t: 0,
+      ts: 0,
       balances: {
         btc: 0,
         usdt: 0,
@@ -71,8 +72,32 @@ const TradeLog = class {
     });
   }
 
-  getLogs(tStart, tEnd) {
-    
+  getLogs(params) {
+    let { dateFile } = this;
+    let db = null;
+    if (params && params.date) {
+      dateFile = moment(params.date).format('YYYY-MM-DD');
+      const dateFileStr = `${this.dirpath}/${dateFile}.stormdb`;
+      const engine = new StormDB.localFileEngine(dateFileStr, { async: true });
+      db = new StormDB(engine);
+    } else {
+      // use current db
+      db = this.db;
+    }
+
+    let data = db.get('log');
+
+    if (params && params.filterTrades) {
+      data.filter((itm) => {
+        return itm.action;
+      });
+    }
+
+    data.sort((a, b) => {
+      return a.ts - b.ts;
+    });
+
+    return data.value();
   }
 };
 

@@ -33,6 +33,7 @@ const stratBBreEntry = class {
 
     const { tradeLog } = this.tl;
     tradeLog.strategy = 'BB Re-Entry min15';
+    tradeLog.ts = (new Date()).getTime();
 
     const closeVals = this.ranges.getLastBB(moment().startOf('minute'), bbMuliplier);
     const prevCloseMin = moment().startOf('minute').subtract(1, 'minute');
@@ -114,7 +115,7 @@ const stratBBreEntry = class {
     if (tradeLog.action) {
       console.log(tradeLog)
     }
-    
+
   }
 };
 

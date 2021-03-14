@@ -56,7 +56,16 @@
       </b-field>
     </div>
 
-    <br><br>
+    <a
+      v-html="showTradeLog ? 'Hide Log' : 'Show Log'"
+      @click="showTradeLog = !showTradeLog" class="is-link"
+      style="display:block;margin:10px;text-decoration:underline"
+    />
+    <div v-if="showTradeLog" class="trade-log has-text-left has-text-underlined">
+      <pre>
+        {{ tradeLog }}
+      </pre>
+    </div>
 
     <b-table :data="trades" :mobileCards=false class="is-size-7-mobile">
       <b-table-column field="isBuyer" v-slot="props">
@@ -109,6 +118,8 @@ export default {
       balances: [],
       ranges: {},
       autoTrade: 'off',
+      tradeLog: [],
+      showTradeLog: false
     }
   },
 
@@ -251,7 +262,20 @@ export default {
     },
 
     niceTime(ts) {
-      return moment.unix(ts/1000).format('MMM Do YYYY h:mm a')
+      return moment.unix(ts/1000).format('MMM Do YYYY h:mm a');
+    },
+
+    async getTradeLog() {
+      const res = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/getTradeLog`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })).json();
+
+      if (res.data) {
+        this.tradeLog = res.data;
+      }
     },
 
     reload() {
@@ -259,7 +283,7 @@ export default {
       this.getBalances();
       this.getRanges();
       this.getSettings();
-    }
+    },
   },
 
   mounted() {
@@ -283,6 +307,14 @@ export default {
       ],
       "container_id": "tradingview_3194a"
     });
+  },
+
+  watch: {
+    showTradeLog() {
+      if (this.showTradeLog) {
+        this.getTradeLog();
+      }
+    }
   }
 };
 
@@ -315,8 +347,10 @@ export default {
     }
   }
 
-  .Xaction-buttons {
-    text-align:center;
+  .trade-log {
+    max-height:400px;
+    overflow-y:scroll;
+    margin: 20px;
   }
 
 </style>
