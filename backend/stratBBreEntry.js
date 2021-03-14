@@ -7,6 +7,7 @@ const { timeStamp } = require('console');
 const GetRanges = require('./get-ranges');
 const binanceRequests = require('./binance-requests');
 const AppSettings = require('./app-settings');
+const TradeLog = require('./trade-log');
 const { settings } = require('cluster');
 
 moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
@@ -14,11 +15,11 @@ moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 const stratBBreEntry = class {
   constructor() {
     cron.schedule('*/5 * * * * *', async () => {
+      this.tl = new TradeLog();
       const sdb = new AppSettings();
       const appSettings = sdb.getSettings();
       if (appSettings && appSettings.autoTrade === 'on') {
-        const res = await this.detectEntryMinute();
-        console.log(res)
+        await this.detectEntryMinute();
       }
     });
   }
@@ -26,15 +27,20 @@ const stratBBreEntry = class {
   async detectEntryMinute() {
     let doBuy = false;
     let doSell = false;
-    let out = {};
-
     this.ranges = new GetRanges();
     const bbMuliplier = 1;
     const timeFrameBasisKey = 'min15';
 
+    const { tradeLog } = this.tl;
+    tradeLog.strategy = 'BB Re-Entry min15';
+
     const closeVals = this.ranges.getLastBB(moment().startOf('minute'), bbMuliplier);
     const prevCloseMin = moment().startOf('minute').subtract(1, 'minute');
     const prevCloseVals = this.ranges.getLastBB(prevCloseMin, bbMuliplier);
+
+    tradeLog.indicators = closeVals;
+    tradeLog.t = closeVals.min1.t;
+    tradeLog.p = closeVals.min1.p;
 
     const closeUpperBB = closeVals[timeFrameBasisKey].bbUpper;
     const closeLowerBB = closeVals[timeFrameBasisKey].bbLower;
@@ -50,11 +56,13 @@ const stratBBreEntry = class {
     let upperReEntry = false;
     if (openPrice < closeUpperBB && prevClosePrice > prevCloseUpperBB) {
       upperReEntry = true;
+      tradeLog.triggerDetails = 'Upper ReEntry';
     }
 
     let lowerReEntry = false;
     if (openPrice > closeLowerBB && prevClosePrice < prevCloseLowerBB) {
       lowerReEntry = true;
+      tradeLog.triggerDetails = 'Lower ReEntry';
     }
 
     // Ideas:
@@ -69,99 +77,43 @@ const stratBBreEntry = class {
     // 3.
     // add stoploss buy/sell action - when price is in a medium and short trend, do the buy or sell
 
-    const tradeLog = {
-      trigger: '',
-      action: '',
-      p: 0,
-      t: 0,
-      balances: {
-        btc: 0,
-        usdt: 0,
-      },
-      indicators: {
-        min1: {
-          t: 0,
-          ma20: 0,
-          stdDevMultiUpper: 0,
-          stdDevMultiLower: 0,
-          bbUpper: 0,
-          bbLower: 0,
-          stdDev: 0,
-        },
-        min5: {
-          t: 0,
-          ma20: 0,
-          stdDevMultiUpper: 0,
-          stdDevMultiLower: 0,
-          bbUpper: 0,
-          bbLower: 0,
-          stdDev: 0,
-        },
-        min15: {
-          t: 0,
-          ma20: 0,
-          stdDevMultiUpper: 0,
-          stdDevMultiLower: 0,
-          bbUpper: 0,
-          bbLower: 0,
-          stdDev: 0,
-        },
-      },
-    };
-
     let enableTrading = false;
 
     if (lowerReEntry) {
-      out.lowerReEntry = lowerReEntry;
       doBuy = true;
+      tradeLog.trigger = 'Buy';
     } else if (upperReEntry) {
-      out.upperReEntry = upperReEntry;
       doSell = true;
+      tradeLog.trigger = 'Sell';
     }
 
     if (doBuy || doSell) {
       const balances = await binanceRequests.getBalances();
       const balanceBTC = balances && balances.BTC.available ? parseFloat(balances.BTC.available) : 0;
       const balanceUSDT = balances && balances.USDT.available ? parseFloat(balances.USDT.available) : 0;
-      out.balanceBTC = balanceBTC;
-      out.balanceUSDT = balanceUSDT;
+      tradeLog.balances.btc = balanceBTC;
+      tradeLog.balances.usdt = balanceUSDT;
       if (doBuy) {
         if (enableTrading && balanceUSDT > 11) {
           const buyRes = await binanceRequests.marketBuy();
-          out.action = buyRes;
+          if (buyRes === 'buy') {
+            tradeLog.action = 'BUY';
+          }
         }
-        out.trigger = 'BUY';
       } else {
         if (enableTrading && balanceBTC > 0.0002) {
           const sellRes = await binanceRequests.marketSell();
-          out.action = sellRes;
+          if (sellRes === 'sell') {
+            tradeLog.action = 'SELL';
+          }
         }
-        out.trigger = 'SELL';
       }
     }
 
-    out.time = closeVals.min1.time;
+    this.tl.addTradeLog(tradeLog);
 
-    if (closeVals[timeFrameBasisKey].maLength < 18) {
-      out.close = closeVals[timeFrameBasisKey];
-    }
-
-    if (!closeUpperBB) {
-      out.close = closeVals[timeFrameBasisKey];
-    }
-    if (!prevCloseLowerBB) {
-      out.prevClose = prevCloseVals[timeFrameBasisKey];
-    }
-
-    if (upperReEntry || lowerReEntry) {
-      out.closeVals = closeVals[timeFrameBasisKey];
-      out.prevCloseVals = prevCloseVals[timeFrameBasisKey];
-    }
-
-    return out;
-
+    console.log(tradeLog)
   }
-
 };
 
 module.exports = stratBBreEntry;

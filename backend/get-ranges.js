@@ -44,10 +44,10 @@ const GetRanges = class {
       let db = `${dateFileDir}/${dateFile}.stormdb`;
       let engine = new StormDB.localFileEngine(db);
       let vals = (new StormDB(engine)).get('history').value();
-      console.log({
-        db,
-        vals: vals && vals.length ? vals.length : 0
-      })
+      // console.log({
+      //   db,
+      //   vals: vals && vals.length ? vals.length : 0
+      // })
       if (!vals || !vals.length) continue;
       this.allPeriodHist = this.allPeriodHist.concat(vals);
     }
@@ -186,15 +186,17 @@ const GetRanges = class {
 
     const ma = priceTotal / itms.length;
     const stdDev = utils.calcStdDeviation(maitms);
+
     return {
-      time: moment(timeList[0]).tz('America/Toronto').format('h:mm:ss SSS'),
-      serverTime: moment().tz('America/Toronto').format('h:mm:ss SSS'),
+      p: itms[0] ? itms[0].p : null,
+      t: moment(timeList[0]).tz('America/Toronto').format('h:mm:ss SSS'),
       ma,
-      maLength: maitms.length,
+      stdDev,
+      maLen: maitms.length,
       bbUpper: ma + (multiplier * stdDev),
       bbLower: ma - (multiplier * stdDev),
-      p: itms[0] ? itms[0].p : null,
-      multiplier,
+      stdDevMultiUpper: multiplier,
+      stdDevMultiLower: multiplier,
     };
   }
 

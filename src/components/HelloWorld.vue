@@ -258,14 +258,12 @@ export default {
       this.getTrades();
       this.getBalances();
       this.getRanges();
+      this.getSettings();
     }
   },
 
   mounted() {
-    this.getTrades();
-    this.getBalances();
-    this.getRanges();
-    this.getSettings();
+    this.reload()
 
      new TradingView.widget({
       "width": '100%',
