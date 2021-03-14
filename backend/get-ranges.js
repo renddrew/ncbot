@@ -4,10 +4,10 @@ const moment = require('moment-timezone');
 const fs = require('fs');
 const utils = require('./utils');
 const { _ } = require('core-js');
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
 
 moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
-
-// https://www.npmjs.com/package/stormdb
 
 const GetRanges = class {
   
@@ -20,7 +20,7 @@ const GetRanges = class {
   }
 
   getPeriodHistory() {
-    const dateFileDir = './backend/db/btcusdt';
+    const dirpath = './backend/db/btcusdt';
     const histHours = 5;
 
     this.allPeriodHist = [];
@@ -41,11 +41,12 @@ const GetRanges = class {
         dateFile = moment().hour(hourCalc).format('YYYY-MM-DD-H');
       }
 
-      let db = `${dateFileDir}/${dateFile}.stormdb`;
-      let engine = new StormDB.localFileEngine(db);
-      let vals = (new StormDB(engine)).get('history').value();
+      const adapter = new FileSync(`${dirpath}/${dateFile}.json`);
+      const db = low(adapter);
+      
+      let vals = db.get('history').value();
       // console.log({
-      //   db,
+      //   dateFile,
       //   vals: vals && vals.length ? vals.length : 0
       // })
       if (!vals || !vals.length) continue;
