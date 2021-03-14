@@ -16,14 +16,12 @@ const stratBBreEntry = class {
   constructor() {
     cron.schedule('* * * * *', async () => {
       this.tl = new TradeLog();
-
       this.enableTrading = false;
       const sdb = new AppSettings();
       const appSettings = sdb.getSettings();
       if (appSettings && appSettings.autoTrade === 'on') {
         this.enableTrading = true;
       }
-
       await this.detectEntryMinute();
     });
   }
@@ -33,7 +31,7 @@ const stratBBreEntry = class {
     let doSell = false;
     this.ranges = new GetRanges();
     const bbMuliplier = 1;
-    const timeFrameBasisKey = 'min1';
+    const timeFrameBasisKey = 'min5';
 
     const { tradeLog } = this.tl;
     tradeLog.strategy = `BB Re-Entry ${timeFrameBasisKey}`;
