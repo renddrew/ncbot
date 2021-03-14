@@ -16,11 +16,15 @@ const stratBBreEntry = class {
   constructor() {
     cron.schedule('* * * * *', async () => {
       this.tl = new TradeLog();
+
+      this.enableTrading = false;
       const sdb = new AppSettings();
       const appSettings = sdb.getSettings();
       if (appSettings && appSettings.autoTrade === 'on') {
-        await this.detectEntryMinute();
+        this.enableTrading = true;
       }
+
+      await this.detectEntryMinute();
     });
   }
 
@@ -78,8 +82,6 @@ const stratBBreEntry = class {
     // 3.
     // add stoploss buy/sell action - when price is in a medium and short trend, do the buy or sell
 
-    let enableTrading = false;
-
     if (lowerReEntry) {
       doBuy = true;
       tradeLog.trigger = 'Buy';
@@ -95,14 +97,14 @@ const stratBBreEntry = class {
       tradeLog.balances.btc = balanceBTC;
       tradeLog.balances.usdt = balanceUSDT;
       if (doBuy) {
-        if (enableTrading && balanceUSDT > 11) {
+        if (this.enableTrading && balanceUSDT > 11) {
           const buyRes = await binanceRequests.marketBuy();
           if (buyRes === 'buy') {
             tradeLog.action = 'BUY';
           }
         }
       } else {
-        if (enableTrading && balanceBTC > 0.0002) {
+        if (this.enableTrading && balanceBTC > 0.0002) {
           const sellRes = await binanceRequests.marketSell();
           if (sellRes === 'sell') {
             tradeLog.action = 'SELL';
