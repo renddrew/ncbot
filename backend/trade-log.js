@@ -1,4 +1,5 @@
 const StormDB = require('stormdb');
+const fs = require('fs');
 const moment = require('moment-timezone');
 moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 
@@ -6,10 +7,13 @@ moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 
 const TradeLog = class {
   constructor() {
-    const dbLocation = './backend/db/trade-log.stormdb';
-    let engine = new StormDB.localFileEngine(dbLocation, { async: true });
+    const dateFile = moment().format('YYYY-MM-DD');
+    const dirpath = './backend/db/tradeLog/btcusdt';
+    fs.mkdirSync(dirpath, { recursive: true });
+    const dateFileStr = `${dirpath}/${dateFile}.stormdb`;
+    const engine = new StormDB.localFileEngine(dateFileStr, { async: true });
     this.db = new StormDB(engine);
-    this.db.default({ settings: {} });
+    this.db.default({ log: [] });
 
     this.tradeLog = {
       action: '',
@@ -58,24 +62,17 @@ const TradeLog = class {
   }
 
   addTradeLog(entry) {
-
-  } 
-
-  getSettings(key) {
-    key = key || 'settings';
-    return this.db.get(key).value();
-  }
-
-  saveSettings(obj) {
-    return new Promise((resolve) => {
-      const settings = this.getSettings();
-      Object.keys(obj).forEach((key) => {
-        settings[key] = obj[key];
-      });
-      this.db.set('settings', settings).save().then(() => {
+    return new Promise((resolve, reject) => {
+      this.db.get('log').push(entry).save().then(() => {
         resolve('success');
+      }).catch((err) => {
+        reject(err);
       });
     });
+  }
+
+  getLogs(tStart, tEnd) {
+    
   }
 };
 

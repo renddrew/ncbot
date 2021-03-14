@@ -14,7 +14,7 @@ moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 
 const stratBBreEntry = class {
   constructor() {
-    cron.schedule('*/5 * * * * *', async () => {
+    cron.schedule('* * * * *', async () => {
       this.tl = new TradeLog();
       const sdb = new AppSettings();
       const appSettings = sdb.getSettings();
@@ -109,10 +109,12 @@ const stratBBreEntry = class {
         }
       }
     }
-
     this.tl.addTradeLog(tradeLog);
-
-    console.log(tradeLog)
+    
+    if (tradeLog.action) {
+      console.log(tradeLog)
+    }
+    
   }
 };
 
