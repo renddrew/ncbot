@@ -16,6 +16,7 @@ const GetRanges = class {
     this.shortPeriod = this.timeNow - (60*30*1000);    // 30mins
     this.mediumPeriod = this.timeNow - (60*60*1000*1.5); // 1.5hrs
     this.longPeriod = this.timeNow - (60*60*1000*3);   // 3hrs
+    this.periodHistory = {};
     this.getPeriodHistory();
   }
 
@@ -45,10 +46,10 @@ const GetRanges = class {
       const db = low(adapter);
       
       let vals = db.get('history').value();
-      console.log({
-        dateFile,
-        vals: vals && vals.length ? vals.length : 0
-      })
+      // console.log({
+      //   dateFile,
+      //   vals: vals && vals.length ? vals.length : 0
+      // })
       if (!vals || !vals.length) continue;
       this.allPeriodHist = this.allPeriodHist.concat(vals);
     }
@@ -129,6 +130,7 @@ const GetRanges = class {
     data.longUptrend = longPeriodStartEnd.start < longPeriodStartEnd.end;        // short and medium trend averages are greater than long trend
     data.mediumUptrend = mediumPeriodStartEnd.start < mediumPeriodStartEnd.end;  // medium average is greater than long average
     data.shortUptrend = shortPeriodStartEnd.start < shortPeriodStartEnd.end;     // short average is greater than medium average
+    this.periodHistory = data;
     return data;
   }
 
@@ -163,7 +165,7 @@ const GetRanges = class {
         maList.push(p.p);
       }
     }
-    const ma = priceTotal / prices.length;
+    const ma = utils.formatNum(priceTotal / prices.length, 2);
     return { value: ma, list: maList, prices };
   }
 
@@ -171,6 +173,7 @@ const GetRanges = class {
     const maList = this.getMa(timeList);
     const stdDev = utils.calcStdDeviation(maList.list);
     const ma = maList.value
+    multiplierLower = multiplierLower !== null ? multiplierLower : multiplier;
 
     return {
       p: maList.prices[0] ? maList.prices[0].p : null,
@@ -179,80 +182,9 @@ const GetRanges = class {
       stdDev,
       maLen: maList.list.length,
       bbUpper: ma + (multiplier * stdDev),
-      bbLower: ma - (multiplier * stdDev),
+      bbLower: ma - (multiplierLower * stdDev),
       stdDevMultiUpper: multiplier,
-      stdDevMultiLower: multiplier,
-    };
-
-  }
-
-
-  getLastBB(retrieveTime, multiplier) {
-
-    // prepare arrays of last time frames
-    const maSize = 20;
-    const times1min = [];
-    const times5min = [];
-    const times15min = [];
-
-    const start5minTime = parseInt(moment(retrieveTime).format('mm')) - (parseInt(moment(retrieveTime).format('mm')) % 5);
-    const start5minEpoch = moment(retrieveTime).minute(start5minTime).format('x');
-    const start15minTime = parseInt(moment(retrieveTime).format('mm')) - (parseInt(moment(retrieveTime).format('mm')) % 15);
-    const start15minEpoch = moment(retrieveTime).minute(start15minTime).format('x');
-
-    for (let i = 0; i < maSize; i++) {
-      const time1min = parseInt(moment(retrieveTime).subtract(i, 'minute').startOf('minute').format('x'));
-      const time5min = parseInt(moment(start5minEpoch - (i*(1000*60*5))).startOf('minute').format('x'));
-      const time15min = parseInt(moment(start15minEpoch - (i*(1000*60*15))).startOf('minute').format('x'));
-      times1min.push(time1min);
-      times5min.push(time5min);
-      times15min.push(time15min);
-    }
-
-    const min1 = this.calcMaBB(times1min, multiplier);
-    const min5 = this.calcMaBB(times5min, multiplier);
-    const min15 = this.calcMaBB(times15min, multiplier);
-
-    return {
-      min1,
-      min5,
-      min15,
-    };
-  }
-
-  calcMaBB(timeList, multiplier) {
-    // timeList is list of times
-    multiplier = multiplier || 2;
-    const itms = [];
-    const maitms = [];
-    let priceTotal = 0;
-    for (let i = 0; i < timeList.length; i++) {
-      const p = this.allPeriodHist.find(itm => {
-        const minTime = itm.t - (1000*1.8);
-        const maxTime = itm.t + (1000*1.8);
-        return timeList[i] >= minTime && timeList[i] <= maxTime;
-      });
-      if (p && parseFloat(p.p) > 0) {
-        p.nt = moment(p.t).format('llll');
-        itms.push(p);
-        priceTotal += parseFloat(p.p);
-        maitms.push(p.p);
-      }
-    }
-
-    const ma = priceTotal / itms.length;
-    const stdDev = utils.calcStdDeviation(maitms);
-
-    return {
-      p: itms[0] ? itms[0].p : null,
-      t: moment(timeList[0]).tz('America/Toronto').format('h:mm:ss SSS'),
-      ma,
-      stdDev,
-      maLen: maitms.length,
-      bbUpper: ma + (multiplier * stdDev),
-      bbLower: ma - (multiplier * stdDev),
-      stdDevMultiUpper: multiplier,
-      stdDevMultiLower: multiplier,
+      stdDevMultiLower: multiplierLower,
     };
   }
 

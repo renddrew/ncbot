@@ -23,7 +23,6 @@ const utils = {
   },
 
   calcStdDeviation(valsList) {
-
     const listTotal = valsList.reduce((a, b) => a + b, 0);
     const mean = listTotal / valsList.length;
 
@@ -31,10 +30,12 @@ const utils = {
     for (let i = 0; i < valsList.length; i++) {
       variance += ((valsList[i] - mean) * (valsList[i] - mean));
     }
-
     variance = parseFloat(Math.sqrt(variance / (valsList.length - 1)));
+    return this.formatNum(variance > 0 ? variance : 0, 2);
+  },
 
-    return variance > 0 ? variance : 0;
+  isEmpty(obj) {
+    return Object.keys(obj).length === 0;
   }
 
 }

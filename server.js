@@ -66,17 +66,6 @@ cron.schedule('*/5 * * * * *', () => {
   const ph = new SavePriceHistory(lastPrice);
 });
 
-
 // start strategy
 const st = new StratBBreEntry();
-
-
-const ranges = new GetRanges();
-const timeList = ranges.getTimeList(1, 20);
-console.log(timeList)
-
-const ma = ranges.calcBB(timeList, 1);
-console.log(ma)
-
-
 

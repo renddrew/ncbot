@@ -13,8 +13,9 @@ const { settings } = require('cluster');
 moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 
 const stratBBreEntry = class {
-  constructor() {
-    cron.schedule('* * * * *', async () => {
+
+  constructor () {
+    cron.schedule('*/5 * * * * *', async () => {
       this.tl = new TradeLog();
       this.enableTrading = false;
       const sdb = new AppSettings();
@@ -26,51 +27,53 @@ const stratBBreEntry = class {
     });
   }
 
-  async detectEntryMinute() {
+  async detectEntryMinute () {
+    let enableTrading = this.enableTrading;
     let doBuy = false;
     let doSell = false;
-    this.ranges = new GetRanges();
-    const bbMuliplier = 1;
-    const timeFrameBasisKey = 'min1';
+    let bbMuliplier = 1;
+    let bbMuliplierLower = 1;
 
+    const timeFrameMins = 1;
+    
+    this.ranges = new GetRanges();
+
+    if (this.ranges.periodHistory.longUptrend && this.ranges.periodHistory.mediumUptrend) {
+      bbMuliplierLower = 0;
+    }
+    if (!this.ranges.periodHistory.longUptrend && !this.ranges.periodHistory.mediumUptrend) {
+      bbMuliplier = 0;
+    }
+
+    // get default tradelog object to assign to
     const { tradeLog } = this.tl;
-    tradeLog.strategy = `BB Re-Entry ${timeFrameBasisKey}`;
+    tradeLog.strategy = `BB Re-Entry ${timeFrameMins} timeframe`;
     tradeLog.ts = (new Date()).getTime();
 
-    const closeVals = this.ranges.getLastBB(moment().startOf('minute'), bbMuliplier);
-    const prevCloseMin = moment().startOf('minute').subtract(1, 'minute');
-    const prevCloseVals = this.ranges.getLastBB(prevCloseMin, bbMuliplier);
-
-    tradeLog.indicators = closeVals;
-    tradeLog.t = closeVals.min1.t;
-    tradeLog.p = closeVals.min1.p;
-
-    const closeUpperBB = closeVals[timeFrameBasisKey].bbUpper;
-    const closeLowerBB = closeVals[timeFrameBasisKey].bbLower;
-    const prevCloseUpperBB = prevCloseVals[timeFrameBasisKey].bbUpper;
-    const prevCloseLowerBB = prevCloseVals[timeFrameBasisKey].bbLower;
-
-    // open price is price of minute observed
-    // close price is close second price
-    const openPrice = closeVals.min1.p;
-    const prevClosePrice = prevCloseVals.min1.p;
-
-    let enableTrading = this.enableTrading;
+    const timeList = this.ranges.getTimeList(timeFrameMins, 20);
+    const lastClose = this.ranges.calcBB(timeList, bbMuliplier, bbMuliplierLower);
+    const lastCloseTime = moment().startOf('minute').subtract(timeFrameMins, 'minute');
+    const timeListPrev = this.ranges.getTimeList(timeFrameMins, 20, lastCloseTime);
+    const prevClose = this.ranges.calcBB(timeListPrev, bbMuliplier, bbMuliplierLower);
+  
+    tradeLog.indicators = lastClose;
+    tradeLog.t = lastClose.t;
+    tradeLog.p = lastClose.p;
 
     // disable trading if MA too low for time period
-    if (closeVals[timeFrameBasisKey].maLen < 15) {
+    if (lastClose.maLen < 15 || prevClose.maLen < 15) {
       enableTrading = false;
     }
 
     // upper re-entry condition
     let upperReEntry = false;
-    if (openPrice < closeUpperBB && prevClosePrice > prevCloseUpperBB) {
+    if (lastClose.p < lastClose.bbUpper && prevClose.p > prevClose.bbUpper) {
       upperReEntry = true;
       tradeLog.triggerDetails = 'Upper ReEntry';
     }
 
     let lowerReEntry = false;
-    if (openPrice > closeLowerBB && prevClosePrice < prevCloseLowerBB) {
+    if (lastClose.p > lastClose.bbLower && prevClose.p < prevClose.bbLower) {
       lowerReEntry = true;
       tradeLog.triggerDetails = 'Lower ReEntry';
     }
