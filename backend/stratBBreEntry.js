@@ -31,17 +31,17 @@ const stratBBreEntry = class {
     let enableTrading = this.enableTrading;
     let doBuy = false;
     let doSell = false;
-    let bbMuliplier = 1;
-    let bbMuliplierLower = 1;
+    let bbMuliplier = 1.3;
+    let bbMuliplierLower = 1.3;
 
     const timeFrameMins = 1;
     
     this.ranges = new GetRanges();
 
-    if (this.ranges.periodHistory.longUptrend && this.ranges.periodHistory.mediumUptrend) {
+    if (this.ranges.periodHistory.mediumUptrend && this.ranges.periodHistory.shortUptrend) {
       bbMuliplierLower = 0;
     }
-    if (!this.ranges.periodHistory.longUptrend && !this.ranges.periodHistory.mediumUptrend) {
+    if (!this.ranges.periodHistory.mediumUptrend && !this.ranges.periodHistory.shortUptrend) {
       bbMuliplier = 0;
     }
 

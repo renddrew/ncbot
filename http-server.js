@@ -56,7 +56,10 @@ app.post('/getTradeLog', async (req, res) => {
   if (req.body && req.body.filterTrades) {
     params.filterTrades = req.body.filterTrades
   }
-  const data = await tl.getLogs(params)
+  let data = await tl.getLogs(params)
+
+ //data = data.slice(0, -100);
+
   res.send({ data })
 })
 
