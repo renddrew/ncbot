@@ -21,7 +21,7 @@ const GetRanges = class {
 
   getPeriodHistory() {
     const dirpath = './backend/db/btcusdt';
-    const histHours = 5;
+    const histHours = 6;
 
     this.allPeriodHist = [];
     this.shortPeriodHist = [];
@@ -132,7 +132,6 @@ const GetRanges = class {
     return data;
   }
 
-
   getTimeList(timeFrameMins, periodLength, retrieveTime) {
     retrieveTime = retrieveTime || {};
     const timeList = [];
@@ -147,11 +146,43 @@ const GetRanges = class {
     return timeList;
   }
 
-  getMa(timePeriods) {
-
+  getMa(timeList) {
+    const prices = [];
+    const maList = [];
+    let priceTotal = 0;
+    for (let i = 0; i < timeList.length; i++) {
+      const p = this.allPeriodHist.find(itm => {
+        const minTime = itm.t - (1000*0.2);
+        const maxTime = itm.t + (1000*0.2);
+        return timeList[i] >= minTime && timeList[i] <= maxTime;
+      });
+      if (p && parseFloat(p.p) > 0) {
+        p.nt = moment(p.t).format('llll');
+        prices.push(p);
+        priceTotal += parseFloat(p.p);
+        maList.push(p.p);
+      }
+    }
+    const ma = priceTotal / prices.length;
+    return { value: ma, list: maList, prices };
   }
 
-  calcBB(maList, multiplier, multiplierLower) {
+  calcBB(timeList, multiplier, multiplierLower) {
+    const maList = this.getMa(timeList);
+    const stdDev = utils.calcStdDeviation(maList.list);
+    const ma = maList.value
+
+    return {
+      p: maList.prices[0] ? maList.prices[0].p : null,
+      t: moment(timeList[0]).tz('America/Toronto').format('h:mm:ss SSS'),
+      ma,
+      stdDev,
+      maLen: maList.list.length,
+      bbUpper: ma + (multiplier * stdDev),
+      bbLower: ma - (multiplier * stdDev),
+      stdDevMultiUpper: multiplier,
+      stdDevMultiLower: multiplier,
+    };
 
   }
 

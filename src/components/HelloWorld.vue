@@ -15,7 +15,7 @@
     <strong>BTC:</strong> {{ balances.BTC && balances.BTC.available ? (parseFloat(balances.BTC.available) + parseFloat(balances.BTC.onOrder)).toFixed(6) : ''}}
     <strong>USDT:</strong> ${{ balances.USDT && balances.USDT.available ? (parseFloat(balances.USDT.available) + parseFloat(balances.USDT.onOrder)).toFixed(2) : ''}}
 
-    <br> 
+    <br>
 
     On Order:
     <strong>BTC::</strong> {{ balances.BTC && balances.BTC.onOrder ? parseFloat(balances.BTC.onOrder).toFixed(6) : ''}}
@@ -41,7 +41,7 @@
 
     <div>
       <b-field label="Auto Trade">
-        <b-select 
+        <b-select
           v-model="autoTrade"
           placeholder="Auto Trading"
           @input="saveSettings"
@@ -109,12 +109,13 @@
 
 <script>
 
-import Vue from 'vue';
-import VueNativeSock from 'vue-native-websocket';
-import store from '@/store';
+import Vue from 'vue'
+import VueNativeSock from 'vue-native-websocket'
+import store from '@/store'
 
-const moment = require('moment');
+import { mapState } from 'vuex'
 
+const moment = require('moment')
 
 Vue.use(VueNativeSock, process.env.VUE_APP_WS_URL, {
   store,
@@ -124,11 +125,9 @@ Vue.use(VueNativeSock, process.env.VUE_APP_WS_URL, {
   format: 'json'
 })
 
-import { mapState } from 'vuex';
-
 export default {
   name: 'HelloWorld',
-  data() {
+  data () {
     return {
       msg: null,
       trades: [],
@@ -142,60 +141,60 @@ export default {
 
   computed: {
     ...mapState([
-      'socket',
+      'socket'
     ]),
 
-    totalValues() {
-      const lastPrice = parseFloat(this.socket.message.lastPrice);
-      const btcWallet = this.balances.BTC && this.balances.BTC.available ? parseFloat(this.balances.BTC.available) + parseFloat(this.balances.BTC.onOrder) : 0;
-      const usdtWallet = this.balances.USDT && this.balances.USDT.available ? parseFloat(this.balances.USDT.available) + parseFloat(this.balances.USDT.onOrder) : 0;
-      const btcTotal = ((usdtWallet / lastPrice) + btcWallet).toFixed(5);
-      const usdtTotal = ((lastPrice * btcWallet) + usdtWallet).toFixed(2);
-      return { btcTotal, usdtTotal };
+    totalValues () {
+      const lastPrice = parseFloat(this.socket.message.lastPrice)
+      const btcWallet = this.balances.BTC && this.balances.BTC.available ? parseFloat(this.balances.BTC.available) + parseFloat(this.balances.BTC.onOrder) : 0
+      const usdtWallet = this.balances.USDT && this.balances.USDT.available ? parseFloat(this.balances.USDT.available) + parseFloat(this.balances.USDT.onOrder) : 0
+      const btcTotal = ((usdtWallet / lastPrice) + btcWallet).toFixed(5)
+      const usdtTotal = ((lastPrice * btcWallet) + usdtWallet).toFixed(2)
+      return { btcTotal, usdtTotal }
     }
   },
 
   methods: {
-    async getTrades() {
-      let tradeReq = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/getTrades`, {
+    async getTrades () {
+      const tradeReq = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/getTrades`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        },
-      })).json();
+        }
+      })).json()
 
-      let trades = Array.isArray(tradeReq.trades) ? tradeReq.trades : [];
+      const trades = Array.isArray(tradeReq.trades) ? tradeReq.trades : []
       for (let i = 0; i < trades.length; i++) {
-        trades[i].niceTime = moment.unix(trades[i].time/1000).format('DD/M h:mma');
+        trades[i].niceTime = moment.unix(trades[i].time / 1000).format('DD/M h:mma')
       }
-      this.trades = trades;
-      this.$buefy.snackbar.open({message:'got trades', duration: 500});
+      this.trades = trades
+      this.$buefy.snackbar.open({ message: 'got trades', duration: 500 })
     },
 
-    async getBalances() {
+    async getBalances () {
       const balancesRes = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/getBalances`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        },
-      })).json();
-      this.$buefy.snackbar.open({message:'got balances', duration: 500});
-      let balances = balancesRes.balances || {};
-      this.balances = balances;
+        }
+      })).json()
+      this.$buefy.snackbar.open({ message: 'got balances', duration: 500 })
+      const balances = balancesRes.balances || {}
+      this.balances = balances
     },
 
-    async getRanges() {
+    async getRanges () {
       const rangeRes = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/getRanges`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        },
-      })).json();
-      this.$buefy.snackbar.open({message:'got ranges', duration: 500});
-      this.ranges = rangeRes.rangeVals;
+        }
+      })).json()
+      this.$buefy.snackbar.open({ message: 'got ranges', duration: 500 })
+      this.ranges = rangeRes.rangeVals
     },
 
-    marketBuy() {
+    marketBuy () {
       this.$buefy.dialog.confirm({
         message: 'Confirm buy?',
         type: 'is-success',
@@ -204,24 +203,24 @@ export default {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
-            },
-          })).json();
+            }
+          })).json()
 
           if (res && res.result === 'buy') {
-            this.$buefy.snackbar.open({message: 'buy success', duration: 1500});
+            this.$buefy.snackbar.open({ message: 'buy success', duration: 1500 })
             setTimeout(() => {
-              this.getBalances();
-              this.getTrades();
-            }, 500);
+              this.getBalances()
+              this.getTrades()
+            }, 500)
           } else {
-            this.$buefy.snackbar.open({message: res.result, duration: 5000, type: 'is-danger'});
+            this.$buefy.snackbar.open({ message: res.result, duration: 5000, type: 'is-danger' })
             console.log(res)
           }
         }
-      });
+      })
     },
 
-    marketSell() {
+    marketSell () {
       this.$buefy.dialog.confirm({
         message: 'Confirm sell?',
         type: 'is-danger',
@@ -229,110 +228,110 @@ export default {
           const res = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/marketSell`, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
-            },
-          })).json();
+              'Content-Type': 'application/json'
+            }
+          })).json()
 
           if (res && res.result === 'sell') {
-            this.$buefy.snackbar.open({ message: 'sell success', duration: 1500 });
+            this.$buefy.snackbar.open({ message: 'sell success', duration: 1500 })
             setTimeout(() => {
-              this.getBalances();
-              this.getTrades();
-            }, 500);
+              this.getBalances()
+              this.getTrades()
+            }, 500)
           } else {
-            this.$buefy.snackbar.open({ message: res.result, duration: 5000, type: 'is-danger' });
-            console.log(res);
+            this.$buefy.snackbar.open({ message: res.result, duration: 5000, type: 'is-danger' })
+            console.log(res)
           }
-        },
-      });
+        }
+      })
     },
 
-    async getSettings() {
+    async getSettings () {
       const res = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/getSettings`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-        },
-      })).json();
+          'Content-Type': 'application/json'
+        }
+      })).json()
 
       if (res.autoTrade) {
-        this.$buefy.snackbar.open({ message: 'got settings', duration: 500, type: 'is-success' });
-        this.autoTrade = res.autoTrade;
+        this.$buefy.snackbar.open({ message: 'got settings', duration: 500, type: 'is-success' })
+        this.autoTrade = res.autoTrade
       }
     },
 
-    async saveSettings() {
-      const body = JSON.stringify({ autoTrade: this.autoTrade });
+    async saveSettings () {
+      const body = JSON.stringify({ autoTrade: this.autoTrade })
       const res = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/saveSettings`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body
-      })).json();
+      })).json()
       if (res === 'success') {
-        this.$buefy.snackbar.open({ message: 'Saved', duration: 500, type: 'is-success' });
+        this.$buefy.snackbar.open({ message: 'Saved', duration: 500, type: 'is-success' })
       } else {
-        this.$buefy.snackbar.open({ message: 'Save failed', duration: 5000, type: 'is-danger' });
+        this.$buefy.snackbar.open({ message: 'Save failed', duration: 5000, type: 'is-danger' })
       }
-      console.log(res);
+      console.log(res)
     },
 
-    niceTime(ts) {
-      return moment.unix(ts/1000).format('MMM Do YYYY h:mm a');
+    niceTime (ts) {
+      return moment.unix(ts / 1000).format('MMM Do YYYY h:mm a')
     },
 
-    async getTradeLog(tradesOnly) {
-      const params = {};
+    async getTradeLog (tradesOnly) {
+      const params = {}
       if (tradesOnly) {
-        params.filterTrades = true;
+        params.filterTrades = true
       }
       console.log(params)
       const res = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/getTradeLog`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(params)
-      })).json();
+      })).json()
 
       if (res.data) {
-        this.tradeLog = res.data;
-        this.showTradeLog = true;
+        this.tradeLog = res.data
+        this.showTradeLog = true
       }
     },
 
-    reload() {
-      this.getTrades();
-      this.getBalances();
-      this.getRanges();
-      this.getSettings();
-    },
+    reload () {
+      this.getTrades()
+      this.getBalances()
+      this.getRanges()
+      this.getSettings()
+    }
   },
 
-  mounted() {
+  mounted () {
     this.reload()
 
-     new TradingView.widget({
-      "width": '100%',
-      "autosize": false,
-      "symbol": "BINANCE:BTCUSDT",
-      "interval": "5",
-      "timezone": "America/Toronto",
-      "theme": "dark",
-      "style": "1",
-      "locale": "en",
-      "toolbar_bg": "#f1f3f6",
-      "enable_publishing": false,
-      "allow_symbol_change": true,
-      "studies": [
-        "BB@tv-basicstudies",
-        "RSI@tv-basicstudies"
+    new TradingView.widget({
+      width: '100%',
+      autosize: false,
+      symbol: 'BINANCE:BTCUSDT',
+      interval: '5',
+      timezone: 'America/Toronto',
+      theme: 'dark',
+      style: '1',
+      locale: 'en',
+      toolbar_bg: '#f1f3f6',
+      enable_publishing: false,
+      allow_symbol_change: true,
+      studies: [
+        'BB@tv-basicstudies',
+        'RSI@tv-basicstudies'
       ],
-      "container_id": "tradingview_3194a"
-    });
-  },
-};
+      container_id: 'tradingview_3194a'
+    })
+  }
+}
 
 </script>
 
