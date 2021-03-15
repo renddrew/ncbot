@@ -132,6 +132,30 @@ const GetRanges = class {
     return data;
   }
 
+
+  getTimeList(timeFrameMins, periodLength, retrieveTime) {
+    retrieveTime = retrieveTime || {};
+    const timeList = [];
+
+    const startTime = parseInt(moment(retrieveTime).format('mm')) - (parseInt(moment(retrieveTime).format('mm')) % timeFrameMins);
+    const startEpoch = moment(retrieveTime).minute(startTime).format('x');
+
+    for (let i = 0; i < periodLength; i++) {
+      const addTime = parseInt(moment(startEpoch - (i*(1000*60*timeFrameMins))).startOf('minute').format('x'));
+      timeList.push(addTime);
+    }
+    return timeList;
+  }
+
+  getMa(timePeriods) {
+
+  }
+
+  calcBB(maList, multiplier, multiplierLower) {
+
+  }
+
+
   getLastBB(retrieveTime, multiplier) {
 
     // prepare arrays of last time frames
