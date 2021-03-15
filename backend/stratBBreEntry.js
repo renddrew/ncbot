@@ -31,7 +31,7 @@ const stratBBreEntry = class {
     let doSell = false;
     this.ranges = new GetRanges();
     const bbMuliplier = 1;
-    const timeFrameBasisKey = 'min5';
+    const timeFrameBasisKey = 'min1';
 
     const { tradeLog } = this.tl;
     tradeLog.strategy = `BB Re-Entry ${timeFrameBasisKey}`;
