@@ -58,7 +58,7 @@ app.post('/getTradeLog', async (req, res) => {
   }
   let data = await tl.getLogs(params)
 
- //data = data.slice(0, -100);
+  data = data.slice(0, 100);
 
   res.send({ data })
 })
