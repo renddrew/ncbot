@@ -31,7 +31,7 @@ const stratBBreEntry = class {
     let enableTrading = this.enableTrading;
     let doBuy = false;
     let doSell = false;
-    
+
     let bbMuliplier = 1.5;
     let bbMuliplierLower = 1.5;
 
@@ -40,10 +40,10 @@ const stratBBreEntry = class {
     this.ranges = new GetRanges();
 
     if (this.ranges.periodHistory.shortUptrend) {
-      bbMuliplierLower = -0.5;
+      bbMuliplierLower = -0.3;
     }
     if (!this.ranges.periodHistory.shortUptrend) {
-      bbMuliplier = -0.5;
+      bbMuliplier = -0.3;
     }
 
     // get default tradelog object to assign to
