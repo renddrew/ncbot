@@ -31,8 +31,9 @@ const stratBBreEntry = class {
     let enableTrading = this.enableTrading;
     let doBuy = false;
     let doSell = false;
-    let bbMuliplier = 1.3;
-    let bbMuliplierLower = 1.3;
+    
+    let bbMuliplier = 1.5;
+    let bbMuliplierLower = 1.5;
 
     const timeFrameMins = 1;
     
