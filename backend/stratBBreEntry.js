@@ -15,7 +15,7 @@ moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 const stratBBreEntry = class {
 
   constructor () {
-    cron.schedule('* * * * *', async () => {
+    cron.schedule('*/5 * * * * *', async () => {
       this.tl = new TradeLog();
       this.enableTrading = false;
       const sdb = new AppSettings();
@@ -39,10 +39,10 @@ const stratBBreEntry = class {
     this.ranges = new GetRanges();
 
     if (this.ranges.periodHistory.shortUptrend) {
-      bbMuliplierLower = 0.8;
+      bbMuliplierLower = -0.5;
     }
     if (!this.ranges.periodHistory.shortUptrend) {
-      bbMuliplier = 0.8;
+      bbMuliplier = -0.5;
     }
 
     // get default tradelog object to assign to
