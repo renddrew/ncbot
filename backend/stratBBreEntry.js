@@ -38,11 +38,11 @@ const stratBBreEntry = class {
     
     this.ranges = new GetRanges();
 
-    if (this.ranges.periodHistory.mediumUptrend && this.ranges.periodHistory.shortUptrend) {
-      bbMuliplierLower = 0;
+    if (this.ranges.periodHistory.shortUptrend) {
+      bbMuliplierLower = 0.8;
     }
-    if (!this.ranges.periodHistory.mediumUptrend && !this.ranges.periodHistory.shortUptrend) {
-      bbMuliplier = 0;
+    if (!this.ranges.periodHistory.shortUptrend) {
+      bbMuliplier = 0.8;
     }
 
     // get default tradelog object to assign to
