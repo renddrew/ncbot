@@ -101,7 +101,10 @@ const stratDetectRevesal = class {
 
     if (!this.lastTradePrice) {
       const thh = new TradeHelpers();
-      this.lastTradePrice = await thh.getLastTrade().res;
+      const lastTrade = await thh.getLastTrade();
+      if (lastTrade && lastTrade.price) {
+        this.lastTradePrice = parseFloat(lastTrade.price);
+      }
     }
 
     let trigger = ''
