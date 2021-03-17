@@ -83,23 +83,23 @@ const TradeLog = class {
         db = this.db;
       }
 
-      let data = db.get('log');
+      let data = db.get('log').value();
 
       if (params && params.filterTrades) {
-        data.filter((itm) => {
-          return itm.trigger;
+        data = data.filter((itm) => {
+          return itm.trigger && itm.action !== 'NONE';
         });
       }
-
-      data.filter((itm) => {
+     
+      data = data.filter((itm) => {
         return itm.ts;
       });
 
-      data.sort((a, b) => {
+      data = data.sort((a, b) => {
         return b.ts - a.ts;
       });
 
-      resolve(data.value());
+      resolve(data);
     });
   }
 };

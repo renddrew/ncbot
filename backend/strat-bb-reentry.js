@@ -7,32 +7,32 @@ const GetRanges = require('./get-ranges');
 const binanceRequests = require('./binance-requests');
 const AppSettings = require('./app-settings');
 const TradeLog = require('./trade-log');
-const { settings } = require('cluster');
+const TradeHelpers = require('./trade-helpers');
 
 moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 
 const stratBBreEntry = class {
 
   constructor () {
-    cron.schedule('*/5 * * * * *', async () => {
+    cron.schedule('* * * * *', async () => {
       this.tl = new TradeLog();
       await this.detectEntryMinute();
     });
   }
 
   async detectEntryMinute () {
-    let enableTrading = 'false';
     let trigger = '';
     const timeFrameMins = 1;
     this.ranges = new GetRanges();
+    let enableTrading = null;
 
-    let bbMuliplier = 1;
-    let bbMuliplierLower = 1;
+    let bbMuliplier = 1.5;
+    let bbMuliplierLower = 1.5;
 
-    if (this.ranges.periodHistory.shortUptrend) {
+    if (this.ranges.periodHistory.shortUptrend && this.ranges.periodHistory.mediumUptrend) {
       bbMuliplierLower = 0;
     }
-    if (!this.ranges.periodHistory.shortUptrend) {
+    if (!this.ranges.periodHistory.shortUptrend && !this.ranges.periodHistory.mediumUptrend) {
       bbMuliplier = 0;
     }
 
@@ -52,8 +52,9 @@ const stratBBreEntry = class {
     tradeLog.p = lastClose.p;
 
     // disable trading if MA too low for time period
+    let lowHist = false;
     if (lastClose.maLen < 15 || prevClose.maLen < 15) {
-      enableTrading = false;
+      lowHist = true;
     }
 
     // upper re-entry condition
@@ -81,7 +82,7 @@ const stratBBreEntry = class {
     // 3.
     // add stoploss buy/sell action - when price is in a medium and short trend, do the buy or sell
 
-    if (lowerReEntry) {
+    if (!lowHist && lowerReEntry) {
       trigger = 'buy';
     } else if (upperReEntry) {
       trigger = 'sell';
@@ -93,6 +94,7 @@ const stratBBreEntry = class {
       tradeLog.trigger = trigger;
       tradeLog.action = tradeResult.action;
       tradeLog.balances = tradeResult.balances;
+      enableTrading = tradeResult.enableTrading;
     }
 
     this.tl.addTradeLog(tradeLog);
