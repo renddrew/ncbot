@@ -15,35 +15,26 @@ moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 const stratBBreEntry = class {
 
   constructor () {
-    cron.schedule('* * * * *', async () => {
+    cron.schedule('*/5 * * * * *', async () => {
       this.tl = new TradeLog();
-      this.enableTrading = false;
-      const sdb = new AppSettings();
-      const appSettings = sdb.getSettings();
-      if (appSettings && appSettings.autoTrade === 'on') {
-        this.enableTrading = true;
-      }
       await this.detectEntryMinute();
     });
   }
 
   async detectEntryMinute () {
-    let enableTrading = this.enableTrading;
-    let doBuy = false;
-    let doSell = false;
-
-    let bbMuliplier = 1.5;
-    let bbMuliplierLower = 1.5;
-
+    let enableTrading = 'false';
+    let trigger = '';
     const timeFrameMins = 1;
-    
     this.ranges = new GetRanges();
 
+    let bbMuliplier = 1;
+    let bbMuliplierLower = 1;
+
     if (this.ranges.periodHistory.shortUptrend) {
-      bbMuliplierLower = -0.3;
+      bbMuliplierLower = 0;
     }
     if (!this.ranges.periodHistory.shortUptrend) {
-      bbMuliplier = -0.3;
+      bbMuliplier = 0;
     }
 
     // get default tradelog object to assign to
@@ -92,41 +83,24 @@ const stratBBreEntry = class {
     // add stoploss buy/sell action - when price is in a medium and short trend, do the buy or sell
 
     if (lowerReEntry) {
-      doBuy = true;
-      tradeLog.trigger = 'Buy';
+      trigger = 'buy';
     } else if (upperReEntry) {
-      doSell = true;
-      tradeLog.trigger = 'Sell';
+      trigger = 'sell';
     }
 
-    if (doBuy || doSell) {
-      const balances = await binanceRequests.getBalances();
-      const balanceBTC = balances && balances.BTC.available ? parseFloat(balances.BTC.available) : 0;
-      const balanceUSDT = balances && balances.USDT.available ? parseFloat(balances.USDT.available) : 0;
-      tradeLog.balances.btc = balanceBTC;
-      tradeLog.balances.usdt = balanceUSDT;
-      if (doBuy) {
-        if (enableTrading && balanceUSDT > 11) {
-          const buyRes = await binanceRequests.marketBuy();
-          if (buyRes === 'buy') {
-            tradeLog.action = 'BUY';
-          }
-        }
-      } else {
-        if (enableTrading && balanceBTC > 0.0002) {
-          const sellRes = await binanceRequests.marketSell();
-          if (sellRes === 'sell') {
-            tradeLog.action = 'SELL';
-          }
-        }
-      }
+    if (trigger) {
+      const th = new TradeHelpers();
+      const tradeResult = await th.tryTrade(trigger)
+      tradeLog.trigger = trigger;
+      tradeLog.action = tradeResult.action;
+      tradeLog.balances = tradeResult.balances;
     }
+
     this.tl.addTradeLog(tradeLog);
 
-    if (tradeLog.action) {
+    if (trigger) {
       console.log(tradeLog);
     }
-
     console.log({t: tradeLog.t, enableTrading});
   }
 };

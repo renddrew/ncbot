@@ -5,7 +5,8 @@ const app = require('./http-server');
 const utils = require('./backend/utils');
 const SavePriceHistory = require('./backend/save-price-history');
 const GetRanges = require('./backend/get-ranges');
-const StratBBreEntry = require('./backend/stratBBreEntry');
+const StratBBreEntry = require('./backend/strat-bb-reentry');
+const StratDetectReversal = require('./backend/strat-detect-reversal');
 const cron = require('node-cron');
 const moment = require('moment-timezone');
 moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
