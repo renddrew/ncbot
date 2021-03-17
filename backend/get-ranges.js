@@ -10,18 +10,18 @@ moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 
 const GetRanges = class {
   
-  constructor() {
+  constructor(histHours) {
     this.timeNow = parseInt((new Date()).getTime());
     this.shortPeriod = this.timeNow - (60*30*1000);    // 30mins
     this.mediumPeriod = this.timeNow - (60*60*1000*1.5); // 1.5hrs
     this.longPeriod = this.timeNow - (60*60*1000*3);   // 3hrs
     this.periodHistory = {};
-    this.getPeriodHistory();
+    this.getPeriodHistory(histHours);
   }
 
-  getPeriodHistory() {
+  getPeriodHistory(histHours) {
     const dirpath = './backend/db/btcusdt';
-    const histHours = 6;
+    histHours = histHours || 1;
 
     this.allPeriodHist = [];
     this.shortPeriodHist = [];
@@ -172,7 +172,7 @@ const GetRanges = class {
     const maList = this.getMa(timeList);
     const stdDev = utils.calcStdDeviation(maList.list);
     const ma = maList.value
-    multiplierLower = multiplierLower !== null ? multiplierLower : multiplier;
+    multiplierLower = multiplierLower || multiplierLower === 0 ? multiplierLower : multiplier;
 
     return {
       p: maList.prices[0] ? maList.prices[0].p : null,

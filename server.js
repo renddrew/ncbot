@@ -60,11 +60,12 @@ server.listen(8080, () => {
   console.log('http/ws server listening on 8080');
 });
 
+const st = new StratDetectReversal();
+
 // save price history once every server time second
 cron.schedule('*/5 * * * * *', () => {
   const ph = new SavePriceHistory(lastPrice);
+  st.detectReversal(lastPrice)
 });
 
-// start strategy
-const st = new StratBBreEntry();
 

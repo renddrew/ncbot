@@ -15,18 +15,19 @@ moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 const stratDetectRevesal = class {
 
   constructor () {
-    cron.schedule('*/5 * * * * *', async () => {
-      this.tl = new TradeLog();
-      await this.detectReversal();
-    });
+    this.tl = new TradeLog();
   }
 
-  async detectReversal () {
-    let enableTrading = 'false';
-    let trigger = '';
-    const timeFrameMins = 1;
-    this.ranges = new GetRanges();
-
+  async detectReversal (lastPrice, timeFrameMins, multiplier) {
+    timeFrameMins = timeFrameMins || 1;
+    multiplier = multiplier || 0.5;
+    const bbMultiplier = 0.7;
+    const histHours = 2;
+    this.ranges = new GetRanges(histHours);
+    const { tradeLog } = this.tl;
+    tradeLog.strategy = `Detect Reversal ${timeFrameMins} timeframe`;
+    tradeLog.ts = (new Date()).getTime();
+    
     /*
       - remember the highest or lowest price in the last 2x timeframe unit
       - if the current price gets X percentage above or below, call reversal
@@ -34,43 +35,92 @@ const stratDetectRevesal = class {
       - could weight X percentage also by gain since last trade
     */
 
+    // get the high - search through the last results from 3x timeframe mins
+    // build the weighted percentage
+    // compare the current price to the high
 
-    // get default tradelog object to assign to
-    const { tradeLog } = this.tl;
-    tradeLog.strategy = `Detect Reversal ${timeFrameMins} timeframe`;
-    tradeLog.ts = (new Date()).getTime();
+    const hist = this.ranges.allPeriodHist;
+    const pastMins = 3;
+    const rangeHistTime = (new Date()).getTime() - (1000 * 60 * timeFrameMins * pastMins);
+    let rangeHigh = 0;
+    let rangeLow = 0;
+    let histRange = [];
 
+    // calculate the standard deviation
     const timeList = this.ranges.getTimeList(timeFrameMins, 20);
+    const ma20 = this.ranges.getMa(timeList);
+    const stdDev = utils.calcStdDeviation(ma20.list);
+    const reversalWeight = stdDev * multiplier;
+    const bb = this.ranges.calcBB(timeList, bbMultiplier);
+    const bbUpper = bb.bbUpper;
+    const bbLower = bb.bbLower;
+    tradeLog.indicators = bb;
+    tradeLog.p = lastPrice
+    tradeLog.t = bb.t;
 
+    // build percentage
 
-    const lastClose = this.ranges.calcBB(timeList, bbMuliplier, bbMuliplierLower);
-    const lastCloseTime = moment().startOf('minute').subtract(timeFrameMins, 'minute');
-    const timeListPrev = this.ranges.getTimeList(timeFrameMins, 20, lastCloseTime);
-    const prevClose = this.ranges.calcBB(timeListPrev, bbMuliplier, bbMuliplierLower);
-  
-    tradeLog.indicators = lastClose;
-    tradeLog.t = lastClose.t;
-    tradeLog.p = lastClose.p;
+    // compare the current price to the high and low (of past timeframe history)
+    
+    // if the price is X different detect reversal
 
-    // disable trading if MA too low for time period
-    if (lastClose.maLen < 15 || prevClose.maLen < 15) {
-      enableTrading = false;
+    // X different is calculated from a percentage of the price 
+
+    // current price minus highest price > standard deviation
+
+    for (let i = 0; i < hist.length; i++) {
+      if (hist[i].t < rangeHistTime) continue;
+
+      if (hist[i].p > rangeHigh) {
+        rangeHigh = hist[i].p;
+      }
+      if (!rangeLow || hist[i].p < rangeLow) {
+        rangeLow = hist[i].p;
+      }
+      histRange.push(hist[i]);
     }
 
+    let reversalDir = 'none';
 
+    // price is going down
+    // 10 - 8 = 2 > 2
+    const lastPriceHighDiff = (rangeHigh - lastPrice);
+    if (lastPriceHighDiff > reversalWeight) {
+      reversalDir = 'down';
+    }
 
+    // price is going up 
+    // 10 - 8 = 2
+    const lastPriceLowDiff = (lastPrice - rangeLow);
+    if (lastPriceLowDiff > reversalWeight) {
+      reversalDir = 'up';
+    }
 
+    let trigger = ''
+    if (lastPrice > ma20.val && reversalDir === 'down') {
+      trigger = 'SELL'
+    } else if (lastPrice < ma20.val && reversalDir === 'up') {
+      trigger = 'BUY'
+    }
 
-    tradeLog.triggerDetails = 'someting';
-    // set trigger
-
+    let enableTrading = '';
     if (trigger) {
       const th = new TradeHelpers();
       const tradeResult = await th.tryTrade(trigger)
       tradeLog.trigger = trigger;
       tradeLog.action = tradeResult.action;
       tradeLog.balances = tradeResult.balances;
+      enableTrading = tradeResult.enableTrading;
     }
+
+    const out = {
+      reversalDir,
+      reversalWeight,
+      lastPriceHighDiff,
+      lastPriceLowDiff,
+    };
+
+    tradeLog.out = out;
 
     this.tl.addTradeLog(tradeLog);
 
@@ -78,6 +128,7 @@ const stratDetectRevesal = class {
       console.log(tradeLog);
     }
     console.log({t: tradeLog.t, enableTrading});
+    // console.log(out)
   }
 };
 

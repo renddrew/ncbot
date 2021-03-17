@@ -1,11 +1,6 @@
 const cron = require('node-cron');
 const moment = require('moment-timezone');
-const fs = require('fs');
-const utils = require('./utils');
-const { timeStamp } = require('console');
 const GetRanges = require('./get-ranges');
-const binanceRequests = require('./binance-requests');
-const AppSettings = require('./app-settings');
 const TradeLog = require('./trade-log');
 const TradeHelpers = require('./trade-helpers');
 
@@ -23,7 +18,7 @@ const stratBBreEntry = class {
   async detectEntryMinute () {
     let trigger = '';
     const timeFrameMins = 1;
-    this.ranges = new GetRanges();
+    this.ranges = new GetRanges(6); // 6 histhours need to optimize for shorter timeframes 
     let enableTrading = null;
 
     let bbMuliplier = 1.5;

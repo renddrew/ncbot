@@ -23,7 +23,7 @@ app.post('/getBalances', async (req, res) => {
 })
 
 app.post('/getRanges', async (req, res) => {
-  const ranges = new GetRanges()
+  const ranges = new GetRanges(6) // 6 histhours
   const rangeVals = ranges.getPeriodHistory()
   res.send({ rangeVals })
 })
