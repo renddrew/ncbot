@@ -15,10 +15,11 @@ moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 const stratDetectRevesal = class {
 
   constructor () {
-    this.tl = new TradeLog();
+    //this.tl = new TradeLog();
   }
 
   async detectReversal (lastPrice, timeFrameMins, multiplier) {
+    this.tl = new TradeLog();
     timeFrameMins = timeFrameMins || 1;
     multiplier = multiplier || 0.5;
     const bbMultiplier = 0.7;
