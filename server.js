@@ -15,8 +15,6 @@ moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 
 // https://www.npmjs.com/package/node-binance-api
 
-// https://www.npmjs.com/package/stormdb
-
 
 // Create web socket server on top of a regular http server
 // IMPORTANT declare port elsewhere to avoid erris with port un use for both servers

@@ -1,4 +1,3 @@
-const StormDB = require('stormdb');
 const cron = require('node-cron');
 const moment = require('moment-timezone');
 const fs = require('fs');

@@ -1,15 +1,13 @@
-const StormDB = require('stormdb');
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
 const moment = require('moment-timezone');
 moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
-
-// https://www.npmjs.com/package/stormdb
-
 const AppSettings = class {
   constructor() {
-    const dbLocation = './backend/db/appSettings.stormdb';
-    let engine = new StormDB.localFileEngine(dbLocation, { async: true });
-    this.db = new StormDB(engine);
-    this.db.default({ settings: {} });
+    const fileLocation = './backend/db/appSettings.json';
+    const adapter = new FileSync(fileLocation);
+    this.db = low(adapter);
+    this.db.defaults({ settings: {} }).write();
   }
 
   getSettings(key) {
@@ -23,9 +21,8 @@ const AppSettings = class {
       Object.keys(obj).forEach((key) => {
         settings[key] = obj[key];
       });
-      this.db.set('settings', settings).save().then(() => {
-        resolve('success');
-      });
+      this.db.set('settings', settings).write();
+      resolve('success');
     });
   }
 };

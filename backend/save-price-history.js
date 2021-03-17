@@ -1,19 +1,9 @@
-const StormDB = require('stormdb');
-const cron = require('node-cron');
 const moment = require('moment-timezone');
 const fs = require('fs');
-const utils = require('./utils');
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
 
-
-// https://github.com/typicode/lowdb/tree/master/examples#server
-// const low = require('lowdb')
-// const FileAsync = require('lowdb/adapters/FileAsync')
-
 moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
-
-// https://www.npmjs.com/package/stormdb
 
 const SavePriceHistory = class {
   constructor(lastPrice) {

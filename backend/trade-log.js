@@ -1,19 +1,19 @@
-const StormDB = require('stormdb');
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
 const fs = require('fs');
 const moment = require('moment-timezone');
 moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 
-// https://www.npmjs.com/package/stormdb
+// https://www.npmjs.com/package/lowdb
 
 const TradeLog = class {
   constructor() {
     this.dateFile = moment().format('YYYY-MM-DD');
     this.dirpath = './backend/db/tradeLog/btcusdt';
-    fs.mkdirSync(this.dirpath, { recursive: true });
-    this.dateFileStr = `${this.dirpath}/${this.dateFile}.stormdb`;
-    const engine = new StormDB.localFileEngine(this.dateFileStr, { async: true });
-    this.db = new StormDB(engine);
-    this.db.default({ log: [] });
+    this.dateFileStr = `${this.dirpath}/${this.dateFile}.json`;
+    const adapter = new FileSync(this.dateFileStr);
+    this.db = low(adapter);
+    this.db.defaults({ log: [] }).write();
 
     this.tradeLog = {
       action: '',
@@ -64,11 +64,8 @@ const TradeLog = class {
 
   addTradeLog(entry) {
     return new Promise((resolve, reject) => {
-      this.db.get('log').push(entry).save().then(() => {
-        resolve('success');
-      }).catch((err) => {
-        reject(err);
-      });
+      this.db.get('log').push(entry).write();
+      resolve('success');
     });
   }
 
@@ -78,9 +75,9 @@ const TradeLog = class {
       let db = null;
       if (params && params.date) {
         dateFile = moment(params.date).format('YYYY-MM-DD');
-        const dateFileStr = `${this.dirpath}/${dateFile}.stormdb`;
-        const engine = new StormDB.localFileEngine(dateFileStr, { async: true });
-        db = new StormDB(engine);
+        const dateFileStr = `${this.dirpath}/${dateFile}.json`;
+        const adapter = new FileSync(dateFileStr);
+        db = low(adapter);
       } else {
         // use current db
         db = this.db;

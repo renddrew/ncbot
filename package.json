@@ -8,7 +8,7 @@
     "lint": "vue-cli-service lint",
     "backend": "node server.js",
     "dev": "nodemon --ignore './backend/db/' server.js",
-    "syncLocalDb": "rsync -avz --exclude appSettings.stormdb root@157.230.215.44:/var/www/html/backend/db/ ~/documents/web/nodecbot/backend/db"
+    "syncLocalDb": "rsync -avz --exclude appSettings.json root@157.230.215.44:/var/www/html/backend/db/ ~/documents/web/nodecbot/backend/db"
   },
   "main": "server.js",
   "dependencies": {
@@ -26,7 +26,6 @@
     "node-binance-api": "^0.12.4",
     "node-cron": "^2.0.3",
     "register-service-worker": "^1.7.1",
-    "stormdb": "^0.4.1",
     "vue": "^2.6.11",
     "vue-native-websocket": "^2.0.14",
     "vue-router": "^3.2.0",

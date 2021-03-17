@@ -1,4 +1,3 @@
-const StormDB = require('stormdb');
 const cron = require('node-cron');
 const moment = require('moment-timezone');
 const fs = require('fs');
@@ -29,29 +28,21 @@ const stratDetectRevesal = class {
     this.ranges = new GetRanges();
 
     /*
-      - compare the last 2 bars to the current one. 
       - remember the highest or lowest price in the last 2x timeframe unit
       - if the current price gets X percentage above or below, call reversal
       - X percentage could be weighted by volatility. 
       - could weight X percentage also by gain since last trade
     */
 
-    let bbMuliplier = 1.5;
-    let bbMuliplierLower = 1.5;
-
-    if (this.ranges.periodHistory.shortUptrend) {
-      bbMuliplierLower = -0.3;
-    }
-    if (!this.ranges.periodHistory.shortUptrend) {
-      bbMuliplier = -0.3;
-    }
 
     // get default tradelog object to assign to
     const { tradeLog } = this.tl;
-    tradeLog.strategy = `BB Re-Entry ${timeFrameMins} timeframe`;
+    tradeLog.strategy = `Detect Reversal ${timeFrameMins} timeframe`;
     tradeLog.ts = (new Date()).getTime();
 
     const timeList = this.ranges.getTimeList(timeFrameMins, 20);
+
+
     const lastClose = this.ranges.calcBB(timeList, bbMuliplier, bbMuliplierLower);
     const lastCloseTime = moment().startOf('minute').subtract(timeFrameMins, 'minute');
     const timeListPrev = this.ranges.getTimeList(timeFrameMins, 20, lastCloseTime);
@@ -66,36 +57,12 @@ const stratDetectRevesal = class {
       enableTrading = false;
     }
 
-    // upper re-entry condition
-    let upperReEntry = false;
-    if (lastClose.p < lastClose.bbUpper && prevClose.p > prevClose.bbUpper) {
-      upperReEntry = true;
-      tradeLog.triggerDetails = 'Upper ReEntry';
-    }
 
-    let lowerReEntry = false;
-    if (lastClose.p > lastClose.bbLower && prevClose.p < prevClose.bbLower) {
-      lowerReEntry = true;
-      tradeLog.triggerDetails = 'Lower ReEntry';
-    }
 
-    // Ideas:
-    // 1.
-    // add condition to only sell if crossing the MA if short and medium uptrend
-    // add condition to only buy if crossing the MA if short and medium downtrend
 
-    // 2.
-    // adjust standard deviation according to uptrend and downtrend. if uptrend decrease lower stdDev andn increase upper to result in having the system buy sooner and sell later 
-    // probably need to rewrite helper funcs to separate getting MA, getting BB in order to use directly within strategies for more options
 
-    // 3.
-    // add stoploss buy/sell action - when price is in a medium and short trend, do the buy or sell
-
-    if (lowerReEntry) {
-      trigger = 'buy';
-    } else if (upperReEntry) {
-      trigger = 'sell';
-    }
+    tradeLog.triggerDetails = 'someting';
+    // set trigger
 
     if (trigger) {
       const th = new TradeHelpers();
