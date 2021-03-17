@@ -16,6 +16,7 @@ const stratDetectRevesal = class {
 
   constructor () {
     //this.tl = new TradeLog();
+    this.lastTradePrice = 0;
   }
 
   async detectReversal (lastPrice, timeFrameMins, multiplier) {
@@ -98,11 +99,20 @@ const stratDetectRevesal = class {
       reversalDir = 'up';
     }
 
+    if (!this.lastTradePrice) {
+      const thh = new TradeHelpers();
+      this.lastTradePrice = await thh.getLastTrade().res;
+    }
+
     let trigger = ''
-    if (lastPrice < lastPriceClose && lastPrice > ma20.value && reversalDir === 'down') {
+
+    const minSellPriceMet = (this.lastTradePrice && (lastPrice > (this.lastTradePrice * 1.001))) || lastPrice > ma20.value;
+    const minBuyPriceMet = (this.lastTradePrice && (lastPrice < (this.lastTradePrice - (this.lastTradePrice * 0.001)))) || lastPrice < ma20.value;
+
+    if (lastPrice < lastPriceClose && minSellPriceMet && reversalDir === 'down') {
       // SELL if price going down from last close, and lastprice is above ma20 and is downward reversal
       trigger = 'sell'
-    } else if (lastPrice > lastPriceClose && lastPrice < ma20.value && reversalDir === 'up') {
+    } else if (lastPrice > lastPriceClose && minBuyPriceMet && reversalDir === 'up') {
       // BUY if price is going up from last close, and lastPrice is less then ma20 and is upward reversal 
       trigger = 'buy'
     }
@@ -115,6 +125,9 @@ const stratDetectRevesal = class {
       tradeLog.action = tradeResult.action;
       tradeLog.balances = tradeResult.balances;
       enableTrading = tradeResult.enableTrading;
+      if (tradeResult.action !== 'NONE') {
+        this.lastTradePrice = lastPrice;
+      }
     }
 
     const out = {
@@ -122,6 +135,7 @@ const stratDetectRevesal = class {
       reversalWeight,
       lastPriceHighDiff,
       lastPriceLowDiff,
+      lastTradePrice: this.lastTradePrice
     };
 
     tradeLog.out = out;

@@ -45,6 +45,14 @@ const TradeHelpers = class {
     });
   }
 
+  getLastTrade() {
+    return new Promise(async resolve => {
+      binanceRequests.getLastTrade().then((res) => {
+        resolve(res);
+      })
+    });
+  }
+
 }
 
 module.exports = TradeHelpers;

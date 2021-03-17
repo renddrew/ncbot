@@ -15,6 +15,17 @@ const binance = new Binance().options({
 
 const binanceRequests = {
 
+  getLastTrade() {
+    return new Promise((resolve) => {
+      binance.trades('BTCUSDT', (error, trades, symbol) => {
+        trades = trades.sort((a, b) => {
+          return b.time - a.time;
+        });
+        resolve(trades[0]);
+      });
+    });
+  },
+
   getTrades() {
     return new Promise((resolve) => {
       binance.trades('BTCUSDT', (error, trades, symbol) => {
