@@ -22,7 +22,7 @@ const stratDetectRevesal = class {
   async detectReversal (lastPrice, timeFrameMins, multiplier) {
     this.tl = new TradeLog();
     timeFrameMins = timeFrameMins || 1;
-    multiplier = multiplier || 0.5;
+    multiplier = multiplier || 1.3;
     const bbMultiplier = 0.7;
     const histHours = 2;
     this.ranges = new GetRanges(histHours);
@@ -42,7 +42,7 @@ const stratDetectRevesal = class {
     // compare the current price to the high
 
     const hist = this.ranges.allPeriodHist;
-    const pastMins = 3;
+    const pastMins = 5;
     const rangeHistTime = (new Date()).getTime() - (1000 * 60 * timeFrameMins * pastMins);
     let rangeHigh = 0;
     let rangeLow = 0;
@@ -109,8 +109,8 @@ const stratDetectRevesal = class {
 
     let trigger = ''
 
-    const minSellPriceMet = (this.lastTradePrice && (lastPrice > (this.lastTradePrice * 1.002))) || lastPrice > ma20.value;
-    const minBuyPriceMet = (this.lastTradePrice && (lastPrice < (this.lastTradePrice - (this.lastTradePrice * 0.002)))) || lastPrice < ma20.value;
+    const minSellPriceMet = (this.lastTradePrice && (lastPrice > (this.lastTradePrice * 1.003))) || lastPrice > ma20.value;
+    const minBuyPriceMet = (this.lastTradePrice && (lastPrice < (this.lastTradePrice - (this.lastTradePrice * 0.003)))) || lastPrice < ma20.value;
 
     if (lastPrice < lastPriceClose && minSellPriceMet && reversalDir === 'down') {
       // SELL if price going down from last close, and lastprice is above ma20 and is downward reversal
