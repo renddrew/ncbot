@@ -54,6 +54,7 @@ const stratDetectRevesal = class {
     const bb = this.ranges.calcBB(timeList, bbMultiplier);
     const bbUpper = bb.bbUpper;
     const bbLower = bb.bbLower;
+    const lastPriceClose = bb.p;
     tradeLog.indicators = bb;
     tradeLog.p = lastPrice
     tradeLog.t = bb.t;
@@ -97,9 +98,9 @@ const stratDetectRevesal = class {
     }
 
     let trigger = ''
-    if (lastPrice > ma20.val && reversalDir === 'down') {
+    if (lastPrice < lastPriceClose && lastPrice > ma20.value && reversalDir === 'down') {
       trigger = 'SELL'
-    } else if (lastPrice < ma20.val && reversalDir === 'up') {
+    } else if (lastPrice > lastPriceClose && lastPrice < ma20.value && reversalDir === 'up') {
       trigger = 'BUY'
     }
 
