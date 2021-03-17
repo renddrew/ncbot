@@ -99,9 +99,11 @@ const stratDetectRevesal = class {
 
     let trigger = ''
     if (lastPrice < lastPriceClose && lastPrice > ma20.value && reversalDir === 'down') {
-      trigger = 'SELL'
+      // SELL if price going down from last close, and lastprice is above ma20 and is downward reversal
+      trigger = 'sell'
     } else if (lastPrice > lastPriceClose && lastPrice < ma20.value && reversalDir === 'up') {
-      trigger = 'BUY'
+      // BUY if price is going up from last close, and lastPrice is less then ma20 and is upward reversal 
+      trigger = 'buy'
     }
 
     let enableTrading = '';
