@@ -106,8 +106,8 @@ const stratDetectRevesal = class {
 
     let trigger = ''
 
-    const minSellPriceMet = (this.lastTradePrice && (lastPrice > (this.lastTradePrice * 1.001))) || lastPrice > ma20.value;
-    const minBuyPriceMet = (this.lastTradePrice && (lastPrice < (this.lastTradePrice - (this.lastTradePrice * 0.001)))) || lastPrice < ma20.value;
+    const minSellPriceMet = (this.lastTradePrice && (lastPrice > (this.lastTradePrice * 1.002))) || lastPrice > ma20.value;
+    const minBuyPriceMet = (this.lastTradePrice && (lastPrice < (this.lastTradePrice - (this.lastTradePrice * 0.002)))) || lastPrice < ma20.value;
 
     if (lastPrice < lastPriceClose && minSellPriceMet && reversalDir === 'down') {
       // SELL if price going down from last close, and lastprice is above ma20 and is downward reversal
