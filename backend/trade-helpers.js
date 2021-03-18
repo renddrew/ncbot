@@ -6,7 +6,7 @@ const TradeHelpers = class {
   tryTrade(trigger) {
     return new Promise(async resolve => {
       let action = 'NONE';
-      let enableTrading = true;
+      let enableTrading = false;
       const sdb = new AppSettings();
       const appSettings = sdb.getSettings();
       if (appSettings && appSettings.autoTrade === 'on') {
