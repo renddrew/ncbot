@@ -21,14 +21,14 @@ const stratDetectRevesal = class {
 
   async detectReversal (lastPrice, timeFrameMins, multiplier) {
     this.tl = new TradeLog();
-    timeFrameMins = timeFrameMins || 1;
+    timeFrameMins = timeFrameMins || 5;
     multiplier = multiplier || 0.9;
     const commissionRateAdj = 0.002;
     const bbMultiplier = 0.7;
-    const histHours = 2;
+    const histHours = 4;
     this.ranges = new GetRanges(histHours);
     const { tradeLog } = this.tl;
-    tradeLog.strategy = `Detect Reversal ${timeFrameMins} timeframe`;
+    tradeLog.strategy = `Detect Reversal ${timeFrameMins}m timeframe`;
     tradeLog.ts = (new Date()).getTime();
     
     /*
@@ -43,7 +43,7 @@ const stratDetectRevesal = class {
     // compare the current price to the high
 
     const hist = this.ranges.allPeriodHist;
-    const pastMins = 4;
+    const pastMins = 3 * timeFrameMins;
     const rangeHistTime = (new Date()).getTime() - (1000 * 60 * timeFrameMins * pastMins);
     let rangeHigh = 0;
     let rangeLow = 0;
