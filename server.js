@@ -69,7 +69,7 @@ cron.schedule('*/5 * * * * *', () => {
 
 const st = new StratDetectReversal();
 cron.schedule('*/20 * * * * *', () => {
-  st.detectReversal(lastPrice)
+  // st.detectReversal(lastPrice)
 });
 
 

@@ -34,12 +34,12 @@
       <b-tag :type="ranges.shortUptrend ? 'is-success' : 'is-danger'">30 min</b-tag>
     </b-taglist>
 
-    <div class="action-buttons buttons is-centered">
+    <!-- <div class="action-buttons buttons is-centered">
       <b-button @click="marketSell" type="is-danger" outlined>Sell</b-button>
       <b-button @click="marketBuy" type="is-success" outlined>Buy</b-button>
-    </div>
+    </div> -->
 
-    <div>
+    <!-- <div>
       <b-field label="Auto Trade">
         <b-select
           v-model="autoTrade"
@@ -54,7 +54,7 @@
           </option>
         </b-select>
       </b-field>
-    </div>
+    </div> -->
 
     <a
       v-if="!showTradeLog"

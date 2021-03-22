@@ -29,11 +29,17 @@ app.post('/getRanges', async (req, res) => {
 })
 
 app.post('/marketBuy', async (req, res) => {
+
+  return;
+
   const result = await binanceRequests.marketBuy()
   res.send({ result })
 })
 
 app.post('/marketSell', async (req, res) => {
+
+  return; 
+  
   const result = await binanceRequests.marketSell()
   res.send({ result })
 })
@@ -63,6 +69,7 @@ app.post('/getTradeLog', async (req, res) => {
   res.send({ data })
 })
 
+// curl -H 'Content-Type: application/json; charset=utf-8' -d '{"action": "sell","close": "123"}' -X POST https://ncb2.devitup.site/tradingViewTrade
 app.post('/tradingViewTrade', async (req, res) => {
   const action = req.body && req.body.action ? req.body.action : null;
   let result = null
@@ -75,4 +82,3 @@ app.post('/tradingViewTrade', async (req, res) => {
 })
 
 module.exports = app
-
