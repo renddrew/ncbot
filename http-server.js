@@ -63,4 +63,14 @@ app.post('/getTradeLog', async (req, res) => {
   res.send({ data })
 })
 
+app.post('/tradingViewTrade', async (req, res) => {
+  const action = req.body && req.body.action ? req.body.action : null;
+  if (action === 'buy') {
+    const result = await binanceRequests.marketBuy()
+  } else if (action === 'sell') {
+    const result = await binanceRequests.marketSell()
+  }
+  res.send(result)
+})
+
 module.exports = app
