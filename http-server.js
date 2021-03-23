@@ -16,15 +16,17 @@ app.use(express.static('dist'))
 app.post('/getTrades', async (req, res) => {
   let pair = '';
   if (!req.body || !req.body.pair) {
-    res.send('missing pair');
+    res.send('missing pair')
     return;
   }
-  const data = await binanceRequests.getTrades(req.body.pair)
+  const bn = new binanceRequests()
+  const data = await bn.getTrades(req.body.pair)
   res.send(data)
 })
 
 app.post('/getBalances', async (req, res) => {
-  const data = await binanceRequests.getBalances()
+  const bn = new binanceRequests()
+  const data = await bn.getBalances()
   res.send({ balances: data })
 })
 
@@ -40,7 +42,8 @@ app.post('/marketBuy', async (req, res) => {
     res.send('pair required');
     return;
   }
-  const result = await binanceRequests.marketBuy(qty, req.body.pair)
+  const bn = new binanceRequests();
+  const result = await bn.marketBuy(qty, req.body.pair)
   res.send({ result })
 })
 
@@ -50,7 +53,8 @@ app.post('/marketSell', async (req, res) => {
     res.send('pair required');
     return;
   }
-  const result = await binanceRequests.marketSell(qty, req.body.pair)
+  const bn = new binanceRequests();
+  const result = await bn.marketSell(qty, req.body.pair)
   res.send({ result })
 })
 
@@ -85,10 +89,11 @@ app.post('/tradingViewTrade', async (req, res) => {
   const pair = req.body && req.body.pair ? req.body.pair : null
   const qty = null
   let result = null
+  const bn = new binanceRequests();
   if (action === 'buy') {
-    result = await binanceRequests.marketBuy(qty, pair)
+    result = await bn.marketBuy(qty, pair)
   } else if (action === 'sell') {
-    result = await binanceRequests.marketSell(qty, pair)
+    result = await bn.marketSell(qty, pair)
   }
   res.send(result)
 })

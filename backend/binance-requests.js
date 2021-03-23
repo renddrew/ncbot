@@ -1,35 +1,36 @@
-const cors = require('cors');
 const Binance = require('node-binance-api');
 const utils = require('./utils');
 // const { reject } = require('core-js/fn/promise');
+// https://www.npmjs.com/package/node-binance-api
 
-const binance = new Binance().options({
-  // main account renddrew@gmail.com
-  APIKEY: 'i4dMaSxv6iCaZSR8tPUJCQxBmfJVOYRG37enQJHMHMx05JKDSLIdAFX7hxQOo09M',
-  APISECRET: 'f8Y0HqCDu8lFpXOhvuNYGafmd2t27IRmFJqctXsFhjM91gbbP0GuN2HLuD206CPt'
+const binanceRequests = class {
 
-  // bot trade account rend.drew@gmail.com
-  // APIKEY: 'D9KzEBG6N23khpUqIRy0hM9EWwU9Ix7sF7lEUBspCcWaQZgLtVHTZOuZVPfOhUFe',
-  // APISECRET: 'rNA1bvQ3S4FJFmJ1Rn2239JLUjSwLx5K9nQGZ6OWN2AEM1BtynHUfq38Y6Lxdvad'
-
-});
-
-const binanceRequests = {
+  constructor() {
+    this.binance = new Binance().options({
+      // main account renddrew@gmail.com
+      APIKEY: 'i4dMaSxv6iCaZSR8tPUJCQxBmfJVOYRG37enQJHMHMx05JKDSLIdAFX7hxQOo09M',
+      APISECRET: 'f8Y0HqCDu8lFpXOhvuNYGafmd2t27IRmFJqctXsFhjM91gbbP0GuN2HLuD206CPt'
+    
+      // bot trade account rend.drew@gmail.com
+      // APIKEY: 'D9KzEBG6N23khpUqIRy0hM9EWwU9Ix7sF7lEUBspCcWaQZgLtVHTZOuZVPfOhUFe',
+      // APISECRET: 'rNA1bvQ3S4FJFmJ1Rn2239JLUjSwLx5K9nQGZ6OWN2AEM1BtynHUfq38Y6Lxdvad'
+    }); 
+  }
 
   getLastTrade(pair) {
     return new Promise((resolve) => {
-      binance.trades(pair, (error, trades, symbol) => {
+      this.binance.trades(pair, (error, trades, symbol) => {
         trades = trades.sort((a, b) => {
           return b.time - a.time;
         });
         resolve(trades[0]);
       });
     });
-  },
+  }
 
   getTrades(pair) {
     return new Promise((resolve) => {
-      binance.trades(pair, (error, trades, symbol) => {
+      this.binance.trades(pair, (error, trades, symbol) => {
 
         if (!Array.isArray(trades)) {
           resolve({ trades: [], tradesAll: [] });
@@ -85,19 +86,19 @@ const binanceRequests = {
         resolve({ trades: filteredTrades, tradesAll: trades });
       });
     });
-  },
+  }
 
   getBalances() {
     return new Promise((resolve) => {
-      binance.balance((error, balances) => {
+      this.binance.balance((error, balances) => {
         resolve(balances);
       });
     });
-  },
+  }
 
   getPrice(pair) {
     return new Promise((resolve) => {
-      binance.prices(pair, (error, ticker) => {
+      this.binance.prices(pair, (error, ticker) => {
         if (ticker && ticker[pair]) {
           resolve(ticker[pair]);
         } else {
@@ -105,7 +106,7 @@ const binanceRequests = {
         }
       });
     });
-  },
+  }
 
   marketBuy(qty, pair) {
     return new Promise(async(resolve, reject) => {
@@ -137,7 +138,7 @@ const binanceRequests = {
       resolve('buy');
       return;
 
-      binance.marketBuy(pair, qty, (error, response) => {
+      this.binance.marketBuy(pair, qty, (error, response) => {
         if (response.status === 'FILLED') {
           resolve('buy');
           return;
@@ -146,7 +147,7 @@ const binanceRequests = {
         console.log(error);
       });
     });
-  },
+  }
 
   marketSell(qty, pair) {
     return new Promise(async(resolve) => {
@@ -185,7 +186,7 @@ const binanceRequests = {
       resolve('sell');
       return;
 
-      binance.marketSell(pair, qty, (error, response) => {
+      this.binance.marketSell(pair, qty, (error, response) => {
         if (response.status === 'FILLED') {
           resolve('sell');
           return;
@@ -194,7 +195,7 @@ const binanceRequests = {
         console.log(error);
       });
     });
-  },
+  }
 }
 
 module.exports = binanceRequests;

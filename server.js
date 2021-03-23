@@ -1,6 +1,5 @@
 const WSServer = require('ws').Server;
 const server = require('http').createServer();
-const Binance = require('node-binance-api');
 const app = require('./http-server');
 const utils = require('./backend/utils');
 const SavePriceHistory = require('./backend/save-price-history');
@@ -15,9 +14,6 @@ const binanceRequests = require('./backend/binance-requests');
 
 // https://stackoverflow.com/questions/34808925/express-and-websocket-listening-on-the-same-port/34838031
 
-// https://www.npmjs.com/package/node-binance-api
-
-
 // Create web socket server on top of a regular http server
 // IMPORTANT declare port elsewhere to avoid erris with port un use for both servers
 const wss = new WSServer({
@@ -27,14 +23,8 @@ const wss = new WSServer({
 // Also mount the app here
 server.on('request', app);
 
-const binance = new Binance().options({
-  APIKEY: 'i4dMaSxv6iCaZSR8tPUJCQxBmfJVOYRG37enQJHMHMx05JKDSLIdAFX7hxQOo09M',
-  APISECRET: 'f8Y0HqCDu8lFpXOhvuNYGafmd2t27IRmFJqctXsFhjM91gbbP0GuN2HLuD206CPt'
-});
-
-// binance.bookTickers('BTCUSDT', (error, ticker) => {
-//   console.info("bookTickers", ticker);
-// });
+const bn = new binanceRequests();
+const binance = bn.binance;
 
 let lastPrice = 0;
 binance.websockets.chart('BTCUSDT', '1m', (symbol, interval, chart) => {
@@ -66,6 +56,7 @@ server.listen(8080, () => {
 // save price history once every server time second
 cron.schedule('*/5 * * * * *', () => {
   const ph = new SavePriceHistory(lastPrice);
+  console.log(lastPrice)
 });
 
 
