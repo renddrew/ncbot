@@ -17,6 +17,7 @@ const stratBBreEntry = class {
 
   async detectEntryMinute () {
     let trigger = '';
+    const pair = 'BTCUSDT';
     const timeFrameMins = 1;
     this.ranges = new GetRanges(6); // 6 histhours need to optimize for shorter timeframes 
     let enableTrading = null;
@@ -85,7 +86,7 @@ const stratBBreEntry = class {
 
     if (trigger) {
       const th = new TradeHelpers();
-      const tradeResult = await th.tryTrade(trigger)
+      const tradeResult = await th.tryTrade(trigger, pair)
       tradeLog.trigger = trigger;
       tradeLog.action = tradeResult.action;
       tradeLog.balances = tradeResult.balances;

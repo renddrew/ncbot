@@ -128,7 +128,7 @@ const stratDetectRevesal = class {
     let enableTrading = '';
     if (trigger) {
       const th = new TradeHelpers();
-      const tradeResult = await th.tryTrade(trigger)
+      const tradeResult = await th.tryTrade(trigger, pair)
       tradeLog.trigger = trigger;
       tradeLog.action = tradeResult.action;
       tradeLog.balances = tradeResult.balances;

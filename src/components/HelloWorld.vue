@@ -230,11 +230,13 @@ export default {
         message: 'Confirm sell?',
         type: 'is-danger',
         onConfirm: async () => {
+          const body = JSON.stringify({ pair: this.pair })
           const res = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/marketSell`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
-            }
+            },
+            body
           })).json()
 
           if (res && res.result === 'sell') {

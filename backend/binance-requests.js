@@ -134,8 +134,6 @@ const binanceRequests = {
       // format precision
       qty = utils.formatNum(qty, 6);
 
-      console.log(qty);
-
       resolve('buy');
       return;
 
@@ -150,18 +148,31 @@ const binanceRequests = {
     });
   },
 
-  marketSell(qty) {
+  marketSell(qty, pair) {
     return new Promise(async(resolve) => {
+      if (!pair) {
+        resolve('pair required');
+        return;
+      }
+      
+      if (pair.substr(-4) !== 'USDT') {
+        resolve('Must be USDT pair');
+        return;
+      }
+      // remove USDT from pair to get coin
+      const coin = pair.substring(-3, 3)
+
       if (!qty) {
         const balances = await this.getBalances();
-        let btcValue = balances.BTC && balances.BTC.available ? parseFloat(balances.BTC.available) : 0;
-        if (!btcValue) {
+
+        let coinVal = balances[coin] && balances[coin].available ? parseFloat(balances[coin].available) : 0;
+        if (!coinVal) {
           resolve('Failed, please retry or check balance');
           return;
         }
-        btcValue = parseFloat(btcValue);
+        coinVal = parseFloat(coinVal);
         // reduce by %1 to allow for flucutating price
-        qty = btcValue * 0.99;
+        qty = coinVal * 0.99;
       }
       if (!qty) {
         resolve('Problem calculating trade amount');
@@ -174,7 +185,7 @@ const binanceRequests = {
       resolve('sell');
       return;
 
-      binance.marketSell('BTCUSDT', qty, (error, response) => {
+      binance.marketSell(pair, qty, (error, response) => {
         if (response.status === 'FILLED') {
           resolve('sell');
           return;

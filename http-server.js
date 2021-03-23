@@ -45,10 +45,12 @@ app.post('/marketBuy', async (req, res) => {
 })
 
 app.post('/marketSell', async (req, res) => {
-
-  return; 
-
-  const result = await binanceRequests.marketSell()
+  const qty = null;
+  if (!req.body || !req.body.pair) {
+    res.send('pair required');
+    return;
+  }
+  const result = await binanceRequests.marketSell(qty, req.body.pair)
   res.send({ result })
 })
 
