@@ -45,9 +45,9 @@ const TradeHelpers = class {
     });
   }
 
-  getLastTrade() {
+  getLastTrade(pair) {
     return new Promise(async resolve => {
-      binanceRequests.getLastTrade().then((res) => {
+      binanceRequests.getLastTrade(pair).then((res) => {
         resolve(res);
       })
     });

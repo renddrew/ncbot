@@ -20,6 +20,7 @@ const stratDetectRevesal = class {
   }
 
   async detectReversal (lastPrice, timeFrameMins, multiplier) {
+    const pair = 'BTCUSDT';
     this.tl = new TradeLog();
     timeFrameMins = timeFrameMins || 5;
     multiplier = multiplier || 0.9;
@@ -102,7 +103,7 @@ const stratDetectRevesal = class {
 
     if (!this.lastTradePrice) {
       const thh = new TradeHelpers();
-      const lastTrade = await thh.getLastTrade();
+      const lastTrade = await thh.getLastTrade(pair);
       if (lastTrade && lastTrade.price) {
         this.lastTradePrice = parseFloat(lastTrade.price);
       }

@@ -1,23 +1,24 @@
 const cors = require('cors');
 const Binance = require('node-binance-api');
 const utils = require('./utils');
+// const { reject } = require('core-js/fn/promise');
 
 const binance = new Binance().options({
   // main account renddrew@gmail.com
-  // APIKEY: 'i4dMaSxv6iCaZSR8tPUJCQxBmfJVOYRG37enQJHMHMx05JKDSLIdAFX7hxQOo09M',
-  // APISECRET: 'f8Y0HqCDu8lFpXOhvuNYGafmd2t27IRmFJqctXsFhjM91gbbP0GuN2HLuD206CPt'
+  APIKEY: 'i4dMaSxv6iCaZSR8tPUJCQxBmfJVOYRG37enQJHMHMx05JKDSLIdAFX7hxQOo09M',
+  APISECRET: 'f8Y0HqCDu8lFpXOhvuNYGafmd2t27IRmFJqctXsFhjM91gbbP0GuN2HLuD206CPt'
 
   // bot trade account rend.drew@gmail.com
-  APIKEY: 'D9KzEBG6N23khpUqIRy0hM9EWwU9Ix7sF7lEUBspCcWaQZgLtVHTZOuZVPfOhUFe',
-  APISECRET: 'rNA1bvQ3S4FJFmJ1Rn2239JLUjSwLx5K9nQGZ6OWN2AEM1BtynHUfq38Y6Lxdvad'
+  // APIKEY: 'D9KzEBG6N23khpUqIRy0hM9EWwU9Ix7sF7lEUBspCcWaQZgLtVHTZOuZVPfOhUFe',
+  // APISECRET: 'rNA1bvQ3S4FJFmJ1Rn2239JLUjSwLx5K9nQGZ6OWN2AEM1BtynHUfq38Y6Lxdvad'
 
 });
 
 const binanceRequests = {
 
-  getLastTrade() {
+  getLastTrade(pair) {
     return new Promise((resolve) => {
-      binance.trades('BTCUSDT', (error, trades, symbol) => {
+      binance.trades(pair, (error, trades, symbol) => {
         trades = trades.sort((a, b) => {
           return b.time - a.time;
         });
@@ -26,9 +27,14 @@ const binanceRequests = {
     });
   },
 
-  getTrades() {
+  getTrades(pair) {
     return new Promise((resolve) => {
-      binance.trades('BTCUSDT', (error, trades, symbol) => {
+      binance.trades(pair, (error, trades, symbol) => {
+
+        if (!Array.isArray(trades)) {
+          resolve({ trades: [], tradesAll: [] });
+          return;
+        }
 
         trades = trades.sort((a, b) => {
           return b.time - a.time;
@@ -124,6 +130,9 @@ const binanceRequests = {
       // format precision
       qty = utils.formatNum(qty, 6);
 
+      resolve('buy');
+      return;
+
       binance.marketBuy('BTCUSDT', qty, (error, response) => {
         if (response.status === 'FILLED') {
           resolve('buy');
@@ -155,6 +164,9 @@ const binanceRequests = {
 
       // format precision
       qty = utils.formatNum(qty, 6);
+
+      resolve('sell');
+      return;
 
       binance.marketSell('BTCUSDT', qty, (error, response) => {
         if (response.status === 'FILLED') {

@@ -129,6 +129,7 @@ export default {
   name: 'HelloWorld',
   data () {
     return {
+      pair: 'EOSUSDT',
       msg: null,
       trades: [],
       balances: [],
@@ -156,11 +157,13 @@ export default {
 
   methods: {
     async getTrades () {
+      const body = JSON.stringify({ pair: this.pair })
       const tradeReq = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/getTrades`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        body
       })).json()
 
       const trades = Array.isArray(tradeReq.trades) ? tradeReq.trades : []

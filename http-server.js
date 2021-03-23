@@ -13,7 +13,12 @@ app.use(bodyParser.json({ extended: true }))
 app.use(express.static('dist'))
 
 app.post('/getTrades', async (req, res) => {
-  const data = await binanceRequests.getTrades()
+  let pair = '';
+  if (!req.body || !req.body.pair) {
+    res.send('missing pair');
+    return;
+  }
+  const data = await binanceRequests.getTrades(req.body.pair)
   res.send(data)
 })
 
@@ -39,7 +44,7 @@ app.post('/marketBuy', async (req, res) => {
 app.post('/marketSell', async (req, res) => {
 
   return; 
-  
+
   const result = await binanceRequests.marketSell()
   res.send({ result })
 })
