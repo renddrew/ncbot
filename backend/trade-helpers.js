@@ -3,6 +3,10 @@ const binanceRequests = require('./binance-requests');
 
 const TradeHelpers = class {
 
+  constructor() {
+    this.binanceRequests = new binanceRequests();
+  }
+
   tryTrade(trigger, pair) {
     return new Promise(async resolve => {
 
@@ -21,22 +25,20 @@ const TradeHelpers = class {
         enableTrading = true;
       }
 
-      const balances = await binanceRequests.getBalances();
+      const balances = await this.binanceRequests.getBalances();
       const balanceUSDT = balances && balances.USDT.available ? parseFloat(balances.USDT.available) : 0;
       let coinVal = balances[coin] && balances[coin].available ? parseFloat(balances[coin].available) : 0;
 
-      balance
-
       if (trigger === 'buy') {
         if (enableTrading && balanceUSDT > 11) {
-          const buyRes = await binanceRequests.marketBuy();
+          const buyRes = await this.binanceRequests.marketBuy();
           if (buyRes === 'buy') {
             action = 'BUY';
           }
         }
       } else if (trigger === 'sell') {
         if (enableTrading && coinVal > 0.0002) {
-          const sellRes = await binanceRequests.marketSell();
+          const sellRes = await this.binanceRequests.marketSell();
           if (sellRes === 'sell') {
             action = 'SELL';
           }
@@ -47,7 +49,7 @@ const TradeHelpers = class {
         action,
         enableTrading,
         balances: {
-          coin: coinVal,
+          btc: coinVal,
           usdt: balanceUSDT
         }
       }
@@ -58,7 +60,7 @@ const TradeHelpers = class {
 
   getLastTrade(pair) {
     return new Promise(async resolve => {
-      binanceRequests.getLastTrade(pair).then((res) => {
+      this.binanceRequests.getLastTrade(pair).then((res) => {
         resolve(res);
       })
     });

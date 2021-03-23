@@ -8,12 +8,12 @@ const binanceRequests = class {
   constructor() {
     this.binance = new Binance().options({
       // main account renddrew@gmail.com
-      APIKEY: 'i4dMaSxv6iCaZSR8tPUJCQxBmfJVOYRG37enQJHMHMx05JKDSLIdAFX7hxQOo09M',
-      APISECRET: 'f8Y0HqCDu8lFpXOhvuNYGafmd2t27IRmFJqctXsFhjM91gbbP0GuN2HLuD206CPt'
+      // APIKEY: 'i4dMaSxv6iCaZSR8tPUJCQxBmfJVOYRG37enQJHMHMx05JKDSLIdAFX7hxQOo09M',
+      // APISECRET: 'f8Y0HqCDu8lFpXOhvuNYGafmd2t27IRmFJqctXsFhjM91gbbP0GuN2HLuD206CPt'
     
       // bot trade account rend.drew@gmail.com
-      // APIKEY: 'D9KzEBG6N23khpUqIRy0hM9EWwU9Ix7sF7lEUBspCcWaQZgLtVHTZOuZVPfOhUFe',
-      // APISECRET: 'rNA1bvQ3S4FJFmJ1Rn2239JLUjSwLx5K9nQGZ6OWN2AEM1BtynHUfq38Y6Lxdvad'
+      APIKEY: 'D9KzEBG6N23khpUqIRy0hM9EWwU9Ix7sF7lEUBspCcWaQZgLtVHTZOuZVPfOhUFe',
+      APISECRET: 'rNA1bvQ3S4FJFmJ1Rn2239JLUjSwLx5K9nQGZ6OWN2AEM1BtynHUfq38Y6Lxdvad'
     }); 
   }
 
@@ -133,10 +133,12 @@ const binanceRequests = class {
       }
 
       // format precision
-      qty = utils.formatNum(qty, 6);
+      let precision = 6; //btcusdt
+      if (pair === 'ADAUSDT') {
+        precision = 1;
+      }
 
-      resolve('buy');
-      return;
+      qty = utils.formatNum(qty, precision);
 
       this.binance.marketBuy(pair, qty, (error, response) => {
         if (response.status === 'FILLED') {
@@ -181,10 +183,13 @@ const binanceRequests = class {
       }
 
       // format precision
-      qty = utils.formatNum(qty, 6);
+      let precision = 6; //btcusdt
+      if (pair === 'ADAUSDT') {
+        precision = 1;
+      }
 
-      resolve('sell');
-      return;
+      // format precision
+      qty = utils.formatNum(qty, precision);
 
       this.binance.marketSell(pair, qty, (error, response) => {
         if (response.status === 'FILLED') {

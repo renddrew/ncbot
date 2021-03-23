@@ -56,18 +56,12 @@ server.listen(8080, () => {
 // save price history once every server time second
 cron.schedule('*/5 * * * * *', () => {
   const ph = new SavePriceHistory(lastPrice);
-  console.log(lastPrice)
 });
 
 
 const st = new StratDetectReversal();
-cron.schedule('*/20 * * * * *', () => {
+cron.schedule('*/5 * * * * *', () => {
   // st.detectReversal(lastPrice)
 });
-
-(async () => {
-  // const price = await binanceRequests.marketBuy(null, 'EOSUSDT');
-  // console.log(price)
-})();
 
 

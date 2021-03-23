@@ -12,19 +12,19 @@
     </h1>
 
     Holding:
-    <strong>BTC:</strong> {{ balances.BTC && balances.BTC.available ? (parseFloat(balances.BTC.available) + parseFloat(balances.BTC.onOrder)).toFixed(6) : ''}}
+    <strong>{{ this.coin }}</strong> {{ balances[this.coin] && balances[this.coin].available ? (parseFloat(balances[this.coin].available) + parseFloat(balances[this.coin].onOrder)).toFixed(6) : ''}}
     <strong>USDT:</strong> ${{ balances.USDT && balances.USDT.available ? (parseFloat(balances.USDT.available) + parseFloat(balances.USDT.onOrder)).toFixed(2) : ''}}
 
     <br>
 
     On Order:
-    <strong>BTC::</strong> {{ balances.BTC && balances.BTC.onOrder ? parseFloat(balances.BTC.onOrder).toFixed(6) : ''}}
+    <strong>{{ coin }}:</strong> {{ balances[this.coin] && balances[this.coin].onOrder ? parseFloat(balances[this.coin].onOrder).toFixed(6) : ''}}
     <strong>USDT:</strong> ${{ balances.USDT && balances.USDT.onOrder ? parseFloat(balances.USDT.onOrder).toFixed(2) : ''}}
 
     <br>
 
     Wallet Value:
-     <strong>BTC:</strong> {{ totalValues.btcTotal }}
+     <strong>{{ coin }}</strong> {{ totalValues.coinTotal }}
      <strong>USDT:</strong> ${{ totalValues.usdtTotal }}
     <br>
 
@@ -56,6 +56,21 @@
       </b-field>
     </div> -->
 
+    <b-field label="Pair">
+      <b-select
+        v-model="pair"
+        placeholder="Select"
+        @input="reload"
+      >
+        <option
+          v-for="option in pairs"
+          :value="option"
+          :key="option">
+          {{ option }}
+        </option>
+      </b-select>
+    </b-field>
+<!-- 
     <a
       v-if="!showTradeLog"
       v-html="'Show Trades'"
@@ -76,7 +91,7 @@
       @click="showTradeLog = false"
       class="is-link"
       style="display:inline-block;margin:10px;text-decoration:underline"
-    />
+    /> -->
 
     <div v-if="showTradeLog" class="trade-log has-text-left has-text-underlined">
       <pre>
@@ -93,10 +108,10 @@
       <b-table-column field="niceTime" v-slot="props" label="Date">
         {{ props.row.niceTime }}
       </b-table-column>
-      <b-table-column field="qty" v-slot="props" label="Qty BTC">
+      <b-table-column field="qty" v-slot="props" label="Coin Qty">
         {{ props.row.qty }}
       </b-table-column>
-      <b-table-column field="price" v-slot="props" label="BTC Price">
+      <b-table-column field="price" v-slot="props" label="Coin Price">
         ${{ props.row.price }}
       </b-table-column>
       <b-table-column field="quoteQty" v-slot="props" label="Trade Amt">
@@ -129,14 +144,19 @@ export default {
   name: 'HelloWorld',
   data () {
     return {
-      pair: 'EOSUSDT',
+      pair: 'BTCUSDT',
       msg: null,
       trades: [],
       balances: [],
       ranges: {},
       autoTrade: 'off',
       tradeLog: [],
-      showTradeLog: false
+      showTradeLog: false,
+      pairs: [
+        'BTCUSDT',
+        'ADAUSDT',
+        'EOSUSDT'
+      ]
     }
   },
 
@@ -147,11 +167,18 @@ export default {
 
     totalValues () {
       const lastPrice = parseFloat(this.socket.message.lastPrice)
-      const btcWallet = this.balances.BTC && this.balances.BTC.available ? parseFloat(this.balances.BTC.available) + parseFloat(this.balances.BTC.onOrder) : 0
+      const btcWallet = this.balances[this.coin] && this.balances[this.coin].available ? parseFloat(this.balances[this.coin].available) + parseFloat(this.balances[this.coin].onOrder) : 0
       const usdtWallet = this.balances.USDT && this.balances.USDT.available ? parseFloat(this.balances.USDT.available) + parseFloat(this.balances.USDT.onOrder) : 0
-      const btcTotal = ((usdtWallet / lastPrice) + btcWallet).toFixed(5)
+      const coinTotal = ((usdtWallet / lastPrice) + btcWallet).toFixed(5)
       const usdtTotal = ((lastPrice * btcWallet) + usdtWallet).toFixed(2)
-      return { btcTotal, usdtTotal }
+      return { coinTotal, usdtTotal }
+    },
+
+    coin() {
+      if (this.pair.substr(-4) === 'USDT') {
+        return this.pair.substring(-3, 3)
+      }
+      return ''
     }
   },
 
@@ -200,7 +227,7 @@ export default {
     marketBuy () {
       const body = JSON.stringify({ pair: this.pair })
       this.$buefy.dialog.confirm({
-        message: 'Confirm buy?',
+        message: `Confirm buy ${this.pair}?`,
         type: 'is-success',
         onConfirm: async () => {
           const res = await (await fetch(`${process.env.VUE_APP_HTTP_URL}/marketBuy`, {
@@ -227,7 +254,7 @@ export default {
 
     marketSell () {
       this.$buefy.dialog.confirm({
-        message: 'Confirm sell?',
+        message: `Confirm sell ${this.pair}?`,
         type: 'is-danger',
         onConfirm: async () => {
           const body = JSON.stringify({ pair: this.pair })
