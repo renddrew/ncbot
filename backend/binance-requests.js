@@ -107,20 +107,24 @@ const binanceRequests = {
     });
   },
 
-  marketBuy(qty) {
+  marketBuy(qty, pair) {
     return new Promise(async(resolve, reject) => {
       // change to if no qty provided, get balances and trade full balance
+      if (!pair) {
+        resolve('pair required');
+        return;
+      }
       if (!qty) {
         const balances = await this.getBalances();
-        const price = await this.getPrice('BTCUSDT');
+        const price = await this.getPrice(pair);
         const usdt = balances.USDT && balances.USDT.available ? parseFloat(balances.USDT.available) : 0;
         if (!price || !usdt) {
           resolve('Failed, please retry or check balance');
           return;
         }
-        const btcValue = usdt / parseFloat(price);
+        const coinValue = usdt / parseFloat(price);
         // reduce by %1 to allow for flucutating price
-        qty = btcValue * 0.99;
+        qty = coinValue * 0.99;
       }
       if (!qty) {
         resolve('Problem calculating trade amount');
@@ -130,10 +134,12 @@ const binanceRequests = {
       // format precision
       qty = utils.formatNum(qty, 6);
 
+      console.log(qty);
+
       resolve('buy');
       return;
 
-      binance.marketBuy('BTCUSDT', qty, (error, response) => {
+      binance.marketBuy(pair, qty, (error, response) => {
         if (response.status === 'FILLED') {
           resolve('buy');
           return;

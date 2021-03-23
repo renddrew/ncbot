@@ -5,6 +5,7 @@ const binanceRequests = require('./backend/binance-requests')
 const GetRanges = require('./backend/get-ranges')
 const AppSettings = require('./backend/app-settings')
 const TradeLog = require('./backend/trade-log')
+const { response } = require('express')
 
 const app = express()
 app.use(cors())
@@ -34,10 +35,12 @@ app.post('/getRanges', async (req, res) => {
 })
 
 app.post('/marketBuy', async (req, res) => {
-
-  return;
-
-  const result = await binanceRequests.marketBuy()
+  const qty = null;
+  if (!req.body || !req.body.pair) {
+    res.send('pair required');
+    return;
+  }
+  const result = await binanceRequests.marketBuy(qty, req.body.pair)
   res.send({ result })
 })
 
@@ -76,12 +79,14 @@ app.post('/getTradeLog', async (req, res) => {
 
 // curl -H 'Content-Type: application/json; charset=utf-8' -d '{"action": "sell","close": "123"}' -X POST https://ncb2.devitup.site/tradingViewTrade
 app.post('/tradingViewTrade', async (req, res) => {
-  const action = req.body && req.body.action ? req.body.action : null;
+  const action = req.body && req.body.action ? req.body.action : null
+  const pair = req.body && req.body.pair ? req.body.pair : null
+  const qty = null
   let result = null
   if (action === 'buy') {
-    result = await binanceRequests.marketBuy()
+    result = await binanceRequests.marketBuy(qty, pair)
   } else if (action === 'sell') {
-    result = await binanceRequests.marketSell()
+    result = await binanceRequests.marketSell(qty, pair)
   }
   res.send(result)
 })

@@ -34,10 +34,10 @@
       <b-tag :type="ranges.shortUptrend ? 'is-success' : 'is-danger'">30 min</b-tag>
     </b-taglist>
 
-    <!-- <div class="action-buttons buttons is-centered">
+    <div class="action-buttons buttons is-centered">
       <b-button @click="marketSell" type="is-danger" outlined>Sell</b-button>
       <b-button @click="marketBuy" type="is-success" outlined>Buy</b-button>
-    </div> -->
+    </div>
 
     <!-- <div>
       <b-field label="Auto Trade">
@@ -198,6 +198,7 @@ export default {
     },
 
     marketBuy () {
+      const body = JSON.stringify({ pair: this.pair })
       this.$buefy.dialog.confirm({
         message: 'Confirm buy?',
         type: 'is-success',
@@ -206,7 +207,8 @@ export default {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
-            }
+            },
+            body
           })).json()
 
           if (res && res.result === 'buy') {

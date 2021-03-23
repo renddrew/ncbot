@@ -11,6 +11,8 @@ const cron = require('node-cron');
 const moment = require('moment-timezone');
 moment.tz.setDefault("Africa/Abidjan"); // set UTC 0
 
+const binanceRequests = require('./backend/binance-requests');
+
 // https://stackoverflow.com/questions/34808925/express-and-websocket-listening-on-the-same-port/34838031
 
 // https://www.npmjs.com/package/node-binance-api
@@ -71,5 +73,10 @@ const st = new StratDetectReversal();
 cron.schedule('*/20 * * * * *', () => {
   // st.detectReversal(lastPrice)
 });
+
+(async () => {
+  // const price = await binanceRequests.marketBuy(null, 'EOSUSDT');
+  // console.log(price)
+})();
 
 
