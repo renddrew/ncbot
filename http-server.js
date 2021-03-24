@@ -83,7 +83,7 @@ app.post('/getTradeLog', async (req, res) => {
   res.send({ data })
 })
 
-// curl -H 'Content-Type: application/json; charset=utf-8' -d '{"action": "buy","pair": "ADAUSDT"}' -X POST http://localhost:8080/tradingViewTrade
+// curl -H 'Content-Type: application/json; charset=utf-8' -d '{"action": "sell","pair": "ADAUSDT"}' -X POST https://ncb2.devitup.site/tradingViewTrade
 app.post('/tradingViewTrade', async (req, res) => {
   const action = req.body && req.body.action ? req.body.action : null
   const pair = req.body && req.body.pair ? req.body.pair : null
